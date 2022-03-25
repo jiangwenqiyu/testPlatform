@@ -1,0 +1,117 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+#app {
+    background-color: white;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+/*一级二级的位置*/
+#first-second {
+    height: 100%;
+    width: 15%;
+    float: left;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+/* 一二级模块的div */
+#first {
+    float: left;
+    background-color: #333;
+    height: 100%;
+    width: 55%;
+}
+#second {
+    float: left;
+    background-color: gray;
+    height: 100%;
+    width: 45%;
+}
+/*三级大模块的位置*/
+#third {
+    height: 100%;
+    width: 85%;
+    float: left;
+    background-color: antiquewhite;
+    margin: 0;
+    padding: 0;
+}
+
+
+/*一级模块*/
+#first-ul {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 100px;
+    margin: 0;
+
+}
+
+#first-ul li {
+    padding: 20px;
+    list-style: none;
+    color: white;
+}
+
+#second-ul{
+    padding-top: 65px;
+    padding-left: 0;
+    padding-right: 0;
+    list-style: none;
+
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+a:hover {
+    color: grey;
+}
+
+
+.second-content {
+    padding: 5px;
+    margin: 0;
+    font-size: 18px;
+}
+.second-content:hover {
+    color: yellow;
+}
+
+/* 顶部导航 */
+#top-bord {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    width: 100%;
+    height: 10%;
+    /*text-align: center;*/
+}
+
+.bord-style {
+    background-color: yellow;
+    height: 100%;
+    width: auto;
+    display:inline-block;
+    padding-left: 10px;
+    text-align: center !important;
+}
+
+
