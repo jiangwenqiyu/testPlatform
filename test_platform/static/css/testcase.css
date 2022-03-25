@@ -1,0 +1,8 @@
+#case {
+    overflow: scroll;
+}
+
+table {
+    border: 1;
+    cellspacing: 1;
+}

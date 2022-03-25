@@ -96,22 +96,35 @@ a:hover {
 }
 
 /* 顶部导航 */
-#top-bord {
+#third-top {
     margin: 0;
     padding: 0;
-    background-color: white;
+    background-color: antiquewhite;
     width: 100%;
-    height: 10%;
+    height: 8%;
     /*text-align: center;*/
+    display: flex;
+    align-items: center;
 }
 
+
 .bord-style {
+    padding-left: 20px;
+    padding-right: 10px;
     background-color: yellow;
     height: 100%;
     width: auto;
     display:inline-block;
-    padding-left: 10px;
-    text-align: center !important;
 }
 
+#third-middle {
+    margin-top: 10px;
+    background-color: black;
+    height: 30px;
+}
 
+#third-content {
+    /*overflow-x: scroll;*/
+    height: 85%;
+    -webkit-overflow-scrolling: touch;
+}
