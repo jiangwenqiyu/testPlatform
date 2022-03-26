@@ -1,8 +1,11 @@
-
+var currentfirstId;
+var currentsecondId;
+var currentthirdId;
 
 // 获取一级菜单内容:
 function getFirst() {
-    // 清空二级
+    // 加载图标
+    $("#first").append("<div style='height: 100px'><img src='/static/logo1.png' style='height: 100%;width: 100%'></div>");
 
     $.ajax(
         {
@@ -35,6 +38,8 @@ function editFirstColor(obj) {
     $("#second").html('');
     // 清空三级内容
     $("#third-top").html('');
+    $("#third-middle").html('');
+    $("#third-content").html('');
 
     // 写入二级菜单
     var li = $("#first li");
@@ -44,6 +49,8 @@ function editFirstColor(obj) {
     $(obj).parent().css('backgroundColor', 'green');
     var id = $(obj).attr("id");
     id = id.replace("fir-","");
+    currentfirstId = id;
+    localStorage.setItem("currentfirstId", currentfirstId);
     function getSecond() {
         req_data = {"firstId":id};
         $.ajax(
@@ -78,10 +85,15 @@ function editFirstColor(obj) {
 // 点击二级菜单，获取三级菜单内容：重置二级菜单颜色、修改选定菜单颜色、清空三级菜单内容、
 function editSecondColor(obj) {
     // 先清空三级菜单
+    // 清空三级内容
     $("#third-top").html('');
+    $("#third-middle").html('');
+    $("#third-content").html('');
 
     id = $(obj).attr('id');
     id = id.replace('sec-', '');
+    currentsecondId = id;
+    localStorage.setItem('currentsecondId', currentsecondId);
     req_data = {'secondId': id};
 
     // 获取三级菜单
@@ -96,7 +108,7 @@ function editSecondColor(obj) {
                 thirdInfo = resp.data;
                 // 写入三级菜单
                 for (var i = 0; i < thirdInfo.length; i++) {
-                    $("#third-top").append("<div class='bord-style' onclick='editThirdColor(this)'>" + thirdInfo[i].third_name + "</div>");
+                    $("#third-top").append("<div id='third-" + thirdInfo[i].third_id + "' class='bord-style' onclick='editThirdColor(this)'>" + thirdInfo[i].third_name + "</div>");
                 }
             } else {
                 alert(resp.msg);
@@ -106,22 +118,27 @@ function editSecondColor(obj) {
 }
 
 
-function addRow() {
-    $("#third-content table").append("<tr></tr>");
-    $("#third-content table tr").append("<td><div contenteditable='true'></div></td>");
-}
-
 
 // 点击三级菜单，获取表体内容
 function editThirdColor(obj) {
+    id = $(obj).attr('id');
+    id = id.replace("third-", "");
+    currentthirdId = id;
+    localStorage.setItem("currentthirdId", currentthirdId);
+
+    // 清空表体内容
+    $("#third-content").html("");
+
     // 嵌入iframe
     $("#third-content").append("<iframe scrolling=\"yes\" src=\"/static/html/testcase.html\" frameborder=\"0\" width=\"100%\" height=\"100%\"></iframe>")
 }
 
 
+
 $(document).ready(function () {
     // 生成一级菜单
     getFirst();
+
 
 
 });

@@ -1,8 +1,41 @@
 #case {
     overflow: scroll;
+
 }
 
 table {
-    border: 1;
-    cellspacing: 1;
+    table-layout: fixed;
 }
+table tr {
+    height: 20px;
+    overflow: hidden;
+}
+#content-tr {
+    max-height: 60px;
+}
+
+table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #B9B9B9;
+}
+
+.short {
+    padding-right: 5px;
+    padding-left: 5px;
+    color: orange;
+}
+
+.middle {
+    padding-right: 80px;
+    padding-left: 80px;
+    color: orange;
+}
+
+.long {
+    padding-right: 150px;
+    padding-left: 150px;
+    color: orange;
+}
+

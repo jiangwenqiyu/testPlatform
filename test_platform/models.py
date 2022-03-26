@@ -43,6 +43,8 @@ class TestCase(BaseModel, db.Model):
     data = db.Column(db.JSON, nullable=False)
     dataType = db.Column(db.String(10), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    caseOrder = db.Column(db.Integer, nullable=False, unique=True)
+    func_module_id = db.Column(db.Integer, db.ForeignKey("func_module.id"))
 
 
 class ExeCaseRecord(BaseModel, db.Model):
