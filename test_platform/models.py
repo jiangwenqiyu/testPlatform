@@ -41,10 +41,12 @@ class TestCase(BaseModel, db.Model):
     header = db.Column(db.JSON, nullable=False)
     param = db.Column(db.JSON)
     data = db.Column(db.JSON, nullable=False)
-    dataType = db.Column(db.String(10), nullable=False)
+    dataType = db.Column(db.String(10), nullable=False, comment='入参类型  post  json')
+    exp_result = db.Column(db.JSON, nullable=False, comment='预期结果  {"jmespath表达式: 值"}')
+    need_save = db.Column(db.JSON, nullable=False, comment='本次执行后需要保存的值  ["jmespath表达式"]  保存在redis中{用例id_表达式:值}')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    caseOrder = db.Column(db.Integer, nullable=False, unique=True)
-    func_module_id = db.Column(db.Integer, db.ForeignKey("func_module.id"))
+    caseOrder = db.Column(db.Integer, nullable=False, unique=True, comment='用例执行顺序')
+    func_module_id = db.Column(db.Integer, db.ForeignKey("func_module.id"), comment='三级模块的id')
 
 
 class ExeCaseRecord(BaseModel, db.Model):
@@ -53,7 +55,7 @@ class ExeCaseRecord(BaseModel, db.Model):
     consume = db.Column(db.String(10), nullable=False)
     data = db.Column(db.JSON, nullable=False)
     res = db.Column(db.JSON, nullable=False)
-    success = db.Column(db.Integer, nullable=False)
+    success = db.Column(db.Integer, nullable=False, comment='用例执行是否成功 1 成功  2 失败')
     env_name = db.Column(db.String(10), nullable=False)
 
 

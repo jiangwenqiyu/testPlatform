@@ -39,3 +39,7 @@ table td {
     color: orange;
 }
 
+a {
+    color: greenyellow;
+    text-decoration: none;
+}
