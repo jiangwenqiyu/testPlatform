@@ -31,6 +31,11 @@ def getcases():
         temp['exp_result'] = obj.exp_result
         temp['need_save'] = obj.need_save
         temp['id'] = obj.id
+        temp['status'] = obj.status
+        if temp['status'] == None or temp['status'] == '' or temp['status'] == 0:
+            temp['updateTime'] = ''
+        else:
+            temp['updateTime'] = obj.updateTime
         data.append(temp)
 
     return jsonify(status='0', msg='', data = data)
@@ -44,10 +49,38 @@ def savecases():
         updateType = req_data.get('updateType')
         thirdId = req_data.get('thirdId')
         content = req_data.get('content')
+        caseId =  req_data.get('id')
         if updateType == 1: # 插入新数据
-            pass
+            temp = dict()
+            temp['user_id'] = 1  # 用户id暂时写死
+            temp['caseOrder'] = content[0]
+            temp['name'] = content[1]
+            temp['path'] = content[2]
+            temp['dataType'] = content[6]
+            temp['func_module_id'] = thirdId
+            try:
+                temp['header'] = json.loads(content[3])
+                temp['param'] = json.loads(content[4])
+                temp['data'] = json.loads(content[5])
+                temp['exp_result'] = json.loads(content[7])
+                if content[8] == '' or content[8] == None:
+                    temp['need_save'] = content[8]
+                else:
+                    temp['need_save'] = json.loads(content[8])
+            except:
+                return jsonify(status='1', msg='请检查json格式')
+
+            try:
+
+                case = TestCase(**temp)
+                db.session.add(case)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                return jsonify(status='1', msg='数据库更新失败')
+
+
         else:    # 更新数据
-            print(content)
 
             temp = dict()
             temp['caseOrder'] = content[0]
@@ -59,16 +92,51 @@ def savecases():
                 temp['param'] = json.loads(content[4])
                 temp['data'] = json.loads(content[5])
                 temp['exp_result'] = json.loads(content[7])
-                temp['need_save'] = json.loads(content[8])
+                if content[8] == '' or content[8] == None:
+                    temp['need_save'] = content[8]
+                else:
+                    temp['need_save'] = json.loads(content[8])
             except:
                 return jsonify(status='1', msg='请检查json格式')
             try:
-                TestCase.query.filter_by(func_module_id=thirdId).update(temp)
+                TestCase.query.filter_by(id=caseId).update(temp)
                 db.session.commit()
-            except:
+            except Exception as e:
                 db.session.rollback()
+                print(e)
                 return jsonify(status='1', msg='数据库更新失败')
 
 
     return jsonify(status='0', msg='')
+
+
+# 执行测试用例
+@api.route('/runCases', methods=['POST'])
+def runTestCase():
+    '''
+    接收测试用例[用例id]
+    用例表中，标记状态  1  进行中   0  就绪
+    如果传进来的用例，只要有一个在执行中，不允许执行，返回前端，有用例在进行中，不允许批量执行
+    判断是单次执行还是批量执行，单次执行，只进记录表； 批量执行，更新用例表状态，生成单号，插入记录表，后台执行，执行后也需要更新用例表状态
+    :return:
+    '''
+    req_data = request.get_json()
+    # 先判断，用例表是否有进行中的
+    cases = TestCase.query.filter(TestCase.id.in_(req_data)).all()
+    for i in cases:
+        print(i.name)
+
+    if len(req_data) == 1:
+        pass
+    else:
+        pass
+
+
+
+
+    return
+
+
+
+
 

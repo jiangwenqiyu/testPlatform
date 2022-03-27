@@ -1,34 +1,46 @@
 
 // 向table插入一空行
 function insertTr() {
+    // 获取最后一行的排序，+1给添加的下一行
+    maxOrder = parseInt($("table").find('tr:eq(' + ($("table tr").length-1).toString() + ')').find('td:eq(0)').text()) + 1;
+
     $("table").append("<tr id='content-tr'>" +
+        "<td class='index'>" + maxOrder + "</td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
+        "<td contenteditable='true'></td>" +
         "<td></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a class='exe' href=''>测试</a></div><div><a href=''>删除</a></div></td></tr>")
+        "<td></td>" +
+        "<td></td>" +
+        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a href='javascript:;'>删除</a></div></td></tr>")
 }
 
 // 向table插入数据
-function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseDataType,exp,save,caseId) {
+function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseDataType,exp,save,caseId, status, updateTime) {
     caseHeader = JSON.stringify(caseHeader);
     caseData = JSON.stringify(caseData);
     param = JSON.stringify(param);
     exp = JSON.stringify(exp);
     save = JSON.stringify(save);
+    // 转换状态为中文
+    if (status == '0' || status == null || status == '') {
+        status = '就绪';
+    }else if (status == '0') {
+
+    }
+
     if (save == null) {
         save = '';
     }
 
 
     $("table").append("<tr id='content-tr' class='caseId-" + caseId + "'>" +
-        "<td>" + caseOrder + "</td>" +
+        "<td class='index'>" + caseOrder + "</td>" +
         "<td contenteditable='true'>" + caseName + "</td>" +
         "<td contenteditable='true'>" + casePath + "</td>" +
         "<td contenteditable='true'>" + caseHeader + "</td>" +
@@ -37,17 +49,20 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
         "<td contenteditable='true'>" + caseDataType + "</td>" +
         "<td contenteditable='true'>" + exp + "</td>" +
         "<td contenteditable='true'>" + save + "</td>" +
-        "<td contenteditable='true'></td>" +
-        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a href=''>测试</a></div><div><a href=''>删除</a></div></td></tr>");
+        "<td></td>" +
+        "<td>" + status + "</td>" +
+        "<td>" + updateTime + "</td>" +
+        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a  href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a  href='javascript:;'>删除</a></div></td></tr>");
 }
 
 function generateTable() {
     // 生成表格
-    $("div").append("<table border='1' cellspacing='0'></table>");
-    $("table").append("<tr></tr>");
-    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型', '*预期结果', '需要保存的对象', '返回值', '操作'];
+    $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px'></table>");
+    $("table").append("<thead></thead>");
+    $("thead").append("<tr></tr>");
+    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型', '*预期结果', '需要保存的对象', '返回值', '上次执行状态', '上次执行时间', '操作'];
     for (var i = 0; i < title.length; i++) {
-        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作') {
+        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '上次执行时间') {
             $("tr").append("<td class='short'>" + title[i] + "</td>");
         } else if (title[i] == '用例名称' || title[i] == '预期结果' || title[i] == '需要保存的对象') {
             $("tr").append("<td class='middle'>" + title[i] + "</td>");
@@ -69,8 +84,25 @@ function generateTable() {
             } else {
                 data = resp.data;
                 for (var i = 0; i < data.length; i++) {
-                    insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id);
+                    insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id, data[i].status, data[i].updateTime);
                 }
+
+                // 双击可拖动,并排序
+                $("tbody").on("dblclick", function () {
+                    $("tbody").sortable({
+                        stop: function () {
+                            $('tbody tr').each(function (i) {
+                                $(this).children().eq(0).text(i + 1);
+                            });
+                        }
+                    });
+                });
+
+                // 单击可编辑
+                $("tbody").on("click", function () {
+                    $("tbody").sortable("destroy");
+                });
+
             }
         }
     });
@@ -85,19 +117,19 @@ function savecase(obj) {
         data['updateType'] = 1; // 插入数据
     } else {
         data['updateType'] = 2; // 更新数据
-        data['id'] = c.replace('caseId-', '');
+        data['id'] = c.replace('caseId-', '').replace(' ui-sortable-handle', '');
     }
 
     content = [];
     $(obj).parent().parent().parent().children().each(function (i) {
-
+        temp = $.trim($(this).text());
         if (i in [1, 2, 3, 7]) {
-            if ($.trim($(this).text()) == null || $.trim($(this).text()) == '') {
+            if (temp == null || temp == '') {
                 alert('必填项不能为空！');
                 throw '必填项不能为空';
             }
         }
-        content.push($(this).text());
+        content.push(temp);
     });
     // 把遍历的结果传入data
     data['content'] = content;
@@ -120,13 +152,116 @@ function savecase(obj) {
             }
         }
     });
+}
 
+// 保存全部用例
+function saveallcases() {
+    data = [];
+    $('tbody tr').each(function (i) {
+        temp = {};
+        content = [];
+        $(this).children().each(function (j) {
+            // 对文本首尾去除空白字符
+            text = $(this).text().trim();
+            // 判断必填项是否为空
+            if (j in [1, 2, 3, 7] && (text == '' || text == null)) {
+                alert('请检查必填项不能为空');
+                throw '必填项不能为空';
+            }
+            // 判断是新增还是更新
+            judge = $(this).parent().attr('class');
+            if (judge == null) {  // 新增
+                temp['updateType'] = 1;  // ui-sortable-handle
+                temp['id'] = null;
+            } else {             // 更新
+                temp['updateType'] = 2;
+                temp['id'] = judge.replace(' ui-sortable-handle', '').replace('caseId-', '');
+            }
+            // 获取三级类id
+            temp['thirdId'] = localStorage.getItem('currentthirdId');
+
+            // 构建content参数
+            content.push(text);
+            temp['content'] = content;
+        });
+        data.push(temp);
+    });
+
+    $.ajax({
+        url:'/loginInfo/saveCases',
+        type: 'post',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function (resp) {
+            if (resp.status != '0') {
+                alert(resp.msg);
+            } else {
+                alert('保存成功！');
+            }
+        }
+    });
 
 
 }
 
 
+
+/*  执行测试用例的代码  */
+// 执行单条测试用例
+function runSingle(obj) {
+    // 判断用例是否保存
+    cl = $(obj).parent().parent().parent().attr('class').replace(' ui-sortable-handle','');
+    if (cl == null || cl == '') {
+        alert('需要先保存刷新一下才能执行');
+    } else {
+
+
+
+    }
+}
+
+
+
+
+
 $(document).ready(function () {
     generateTable();
+
+
+    // var fixHelperModified = function(e, tr) {
+    //         //children() 方法返回返回被选元素的所有直接子元素
+    //         var $originals = tr.children();
+    //         //clone() 方法生成被选元素的副本，包含子节点、文本和属性
+    //         var $helper = tr.clone();
+    //         //each() 方法规定为每个匹配元素规定运行的函数
+    //         $helper.children().each(function(index) {
+    //             //width() 方法返回或设置匹配元素的宽度
+    //             //eq() 方法将匹配元素集缩减值指定 index 上的一个
+    //             $(this).width($originals.eq(index).width())
+    //         });
+    //         return $helper;
+    //     },
+    //     updateIndex = function(e, ui) {
+    //         //ui.item - 表示当前拖拽的元素
+    //         //parent() 获得当前匹配元素集合中每个元素的父元素，使用选择器进行筛选是可选的
+    //         $('td.index', ui.item.parent()).each(function(i) {
+    //             //html() 方法返回或设置被选元素的内容 (inner HTML)
+    //             $(this).html(i + 1);
+    //         });
+    //     };
+    // $("tbody tr").sortable({
+    //     //设置是否在拖拽元素时，显示一个辅助的元素。可选值：'original', 'clone'
+    //     helper: fixHelperModified,
+    //     //当排序动作结束时触发此事件。
+    //     stop: updateIndex
+    // }).disableSelection();
+
+
+
+
+
+
+
 
 });

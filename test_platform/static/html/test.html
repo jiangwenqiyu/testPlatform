@@ -1,92 +1,90 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>添加用户</title>
-    <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-</head>
-<body>
-<center>
-    <br><br>
-    添加用户:<br><br>
-    姓名: <input type="text" name="name" id="name" />
-    email: <input type="text" name="email" id="email" />
-    电话: <input type="text" name="tel" id="tel" /><br><br>
-    <button id="addUser">提交</button>
-    <br><br>
-    <hr>
-    <br><br>
-    <table id="usertable" border="1" cellpadding="5" cellspacing=0>
-        <tbody>
-        <tr>
-            <th>姓名</th>
-            <th>email</th>
-            <th>电话</th>
-            <th> </th>
-        </tr>
-        <tr>
-            <td>Tom</td>
-            <td>tom@tom.com</td>
-            <td>5000</td>
-            <td><a href="deleteEmp?id=Tom">Delete</a></td>
-        </tr>
-        <tr>
-            <td>Jerry</td>
-            <td>jerry@sohu.com</td>
-            <td>8000</td>
-            <td><a href="deleteEmp?id=Jerry">Delete</a></td>
-        </tr>
-        </tbody>
-    </table>
-</center>
-</body>
-<script>
-    $(document).ready(function(){
-        $("#addUser").click(function(){
-            var name = $("#name").val();
-            var email = $("#email").val();
-            var tel = $("#tel").val();
-            var $tr = $("<tr>"+
-                "<td>"+name+"</td>"+
-                "<td>"+email+"</td>"+
-                "<td>"+tel+"</td>"+
-                "<td><a href='deleteEmp?id="+name+"'>删除</a></td>"
-                +"</tr>");
-            var $table = $("#usertable");
-            $table.append($tr);
-            $tr.children().children().click(function(){
-                //alert($(domEle).parent().parent().children(":first").text());
-                //方法1.
-//           $(domEle).parent().parent().remove();
-//           return false;
-                //方法2.
-                return deleteTr($tr);
-            });
-            //不能在这里 给每个<a> 加事件 ，每add一次就each一次，会重复弹出confirm
-//       $("tr td a").each(function(index,domEle){
-//         $(domEle).click(function(){
-//           //alert($(domEle).parent().parent().children(":first").text());
-//           //方法1.
-////            $(domEle).parent().parent().remove();
-////            return false;
-//           //方法2.
-//           return deleteTr($(domEle).parent().parent());
-//         });
-//
-//       });
-        });
-        function deleteTr(aObject) {
-            var flag = window.confirm("您确定要删除"+aObject.children(":first").text()+"名称的值吗？");
-//      alert(flag);
-            if(!flag){
-                return false;
-            } else {
-                aObject.remove();
-                return false;
-            }
-            return false;
+    <meta charset="UTF-8">
+    <title>table拖拽</title>
+    <style>
+        tr {
+            cursor: pointer;
         }
-    })
+
+        td {
+            padding: 5px 10px;
+        }
+    </style>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jq_ui/jquery-ui.js"></script>
+</head>
+
+<body>
+<table id="sort">
+    <thead>
+    <tr>
+        <th class="index">序号</th>
+        <th class="year">年份</th>
+        <th>标题</th>
+        <th>作者</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="index">1</td>
+        <td class="year">2011</td>
+        <td>第一行</td>
+        <td>红发---红发</td>
+    </tr>
+    <tr>
+        <td class="index">2</td>
+        <td class="year">2012</td>
+        <td>第二行</td>
+        <td>多夫朗明哥</td>
+    </tr>
+    <tr>
+        <td class="index">3</td>
+        <td class="year">2013</td>
+        <td>第三行</td>
+        <td>甚平---甚平</td>
+    </tr>
+    <tr>
+        <td class="index">4</td>
+        <td class="year">2014</td>
+        <td>第四行</td>
+        <td>鹰眼---鹰眼</td>
+    </tr>
+    </tbody>
+</table>
+<script>
+    $(document).ready(function() {
+        var fixHelperModified = function(e, tr) {
+                //children() 方法返回返回被选元素的所有直接子元素
+                var $originals = tr.children();
+                //clone() 方法生成被选元素的副本，包含子节点、文本和属性
+                var $helper = tr.clone();
+                //each() 方法规定为每个匹配元素规定运行的函数
+                $helper.children().each(function(index) {
+                    //width() 方法返回或设置匹配元素的宽度
+                    //eq() 方法将匹配元素集缩减值指定 index 上的一个
+                    $(this).width($originals.eq(index).width())
+                });
+                return $helper;
+            },
+            updateIndex = function(e, ui) {
+                //ui.item - 表示当前拖拽的元素 
+                //parent() 获得当前匹配元素集合中每个元素的父元素，使用选择器进行筛选是可选的
+                $('td.index', ui.item.parent()).each(function(i) {
+                    //html() 方法返回或设置被选元素的内容 (inner HTML)
+                    $(this).html(i + 1);
+                });
+            };
+        $("#sort tbody").sortable({
+            //设置是否在拖拽元素时，显示一个辅助的元素。可选值：'original', 'clone' 
+            helper: fixHelperModified,
+            //当排序动作结束时触发此事件。 
+            stop: updateIndex
+        }).disableSelection();
+    });
 </script>
+</body>
+
 </html>

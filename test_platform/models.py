@@ -45,8 +45,9 @@ class TestCase(BaseModel, db.Model):
     exp_result = db.Column(db.JSON, nullable=False, comment='预期结果  {"jmespath表达式: 值"}')
     need_save = db.Column(db.JSON, nullable=False, comment='本次执行后需要保存的值  ["jmespath表达式"]  保存在redis中{用例id_表达式:值}')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    caseOrder = db.Column(db.Integer, nullable=False, unique=True, comment='用例执行顺序')
+    caseOrder = db.Column(db.Integer, nullable=False, comment='用例执行顺序')
     func_module_id = db.Column(db.Integer, db.ForeignKey("func_module.id"), comment='三级模块的id')
+    status = db.Column(db.Integer, comment='当前用例状态 0 就绪  1 进行中  2  成功  3  失败')
 
 
 class ExeCaseRecord(BaseModel, db.Model):
