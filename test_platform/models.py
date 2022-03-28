@@ -1,3 +1,5 @@
+#encoding=utf8
+
 from test_platform import db
 import datetime
 
@@ -41,7 +43,8 @@ class TestCase(BaseModel, db.Model):
     header = db.Column(db.JSON, nullable=False)
     param = db.Column(db.JSON)
     data = db.Column(db.JSON, nullable=False)
-    dataType = db.Column(db.String(10), nullable=False, comment='入参类型  post  json')
+    dataType = db.Column(db.String(10), nullable=False, comment='入参类型  data json ')
+    reqType = db.Column(db.String(10), nullable=False, comment='请求类型  get post ')
     exp_result = db.Column(db.JSON, nullable=False, comment='预期结果  {"jmespath表达式: 值"}')
     need_save = db.Column(db.JSON, nullable=False, comment='本次执行后需要保存的值  ["jmespath表达式"]  保存在redis中{用例id_表达式:值}')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

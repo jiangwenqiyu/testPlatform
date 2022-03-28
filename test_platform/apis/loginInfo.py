@@ -1,3 +1,5 @@
+#encoding=utf8
+
 from test_platform.apis import api
 from flask import request, jsonify, current_app
 from test_platform.models import Module, OpeSystems, FuncModule

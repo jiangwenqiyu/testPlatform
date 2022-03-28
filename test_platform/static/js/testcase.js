@@ -1,27 +1,50 @@
 
 // 向table插入一空行
 function insertTr() {
-    // 获取最后一行的排序，+1给添加的下一行
-    maxOrder = parseInt($("table").find('tr:eq(' + ($("table tr").length-1).toString() + ')').find('td:eq(0)').text()) + 1;
+    // 如果没有用例则排序为1
+    if ($("table tbody tr").length == 0) {
 
-    $("table").append("<tr id='content-tr'>" +
-        "<td class='index'>" + maxOrder + "</td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td contenteditable='true'></td>" +
-        "<td></td>" +
-        "<td></td>" +
-        "<td></td>" +
-        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a href='javascript:;'>删除</a></div></td></tr>")
+        $("table").append("<tr id='content-tr'>" +
+            "<td class='index'>1</td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td></td>" +
+            "<td></td>" +
+            "<td></td>" +
+            "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a href='javascript:;' onclick='deleteCase(this);'>删除</a></div></td></tr>")
+
+    }
+    else
+        {
+        // 获取最后一行的排序，+1给添加的下一行
+        maxOrder = parseInt($("table").find('tr:eq(' + ($("table tr").length - 1).toString() + ')').find('td:eq(0)').text()) + 1;
+
+        $("table").append("<tr id='content-tr'>" +
+            "<td class='index'>" + maxOrder + "</td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
+            "<td></td>" +
+            "<td></td>" +
+            "<td></td>" +
+            "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a href='javascript:;' onclick='deleteCase(this);'>删除</a></div></td></tr>")
+        }
 }
 
 // 向table插入数据
-function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseDataType,exp,save,caseId, status, updateTime) {
+function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseDataType,exp,save,caseId, status, updateTime, caseReqType) {
     caseHeader = JSON.stringify(caseHeader);
     caseData = JSON.stringify(caseData);
     param = JSON.stringify(param);
@@ -47,12 +70,13 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
         "<td contenteditable='true'>" + param + "</td>" +
         "<td contenteditable='true'>" + caseData + "</td>" +
         "<td contenteditable='true'>" + caseDataType + "</td>" +
+        "<td contenteditable='true'>" + caseReqType + "</td>" +
         "<td contenteditable='true'>" + exp + "</td>" +
         "<td contenteditable='true'>" + save + "</td>" +
         "<td></td>" +
         "<td>" + status + "</td>" +
         "<td>" + updateTime + "</td>" +
-        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a  href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a  href='javascript:;'>删除</a></div></td></tr>");
+        "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a  href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a  href='javascript:;' onclick='deleteCase(this);'>删除</a></div></td></tr>");
 }
 
 function generateTable() {
@@ -60,9 +84,9 @@ function generateTable() {
     $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px'></table>");
     $("table").append("<thead></thead>");
     $("thead").append("<tr></tr>");
-    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型', '*预期结果', '需要保存的对象', '返回值', '上次执行状态', '上次执行时间', '操作'];
+    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型', '*请求类型','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '上次执行时间', '操作'];
     for (var i = 0; i < title.length; i++) {
-        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '上次执行时间') {
+        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '上次执行时间' || title[i] == '请求类型') {
             $("tr").append("<td class='short'>" + title[i] + "</td>");
         } else if (title[i] == '用例名称' || title[i] == '预期结果' || title[i] == '需要保存的对象') {
             $("tr").append("<td class='middle'>" + title[i] + "</td>");
@@ -84,24 +108,9 @@ function generateTable() {
             } else {
                 data = resp.data;
                 for (var i = 0; i < data.length; i++) {
-                    insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id, data[i].status, data[i].updateTime);
+                    insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id, data[i].status, data[i].updateTime, data[i].dataReqType);
                 }
 
-                // 双击可拖动,并排序
-                $("tbody").on("dblclick", function () {
-                    $("tbody").sortable({
-                        stop: function () {
-                            $('tbody tr').each(function (i) {
-                                $(this).children().eq(0).text(i + 1);
-                            });
-                        }
-                    });
-                });
-
-                // 单击可编辑
-                $("tbody").on("click", function () {
-                    $("tbody").sortable("destroy");
-                });
 
             }
         }
@@ -206,17 +215,55 @@ function saveallcases() {
 }
 
 
+// 给tr重新排序
+function reOrder() {
+    parseInt($("tbody tr").eq($("tbody tr").length - 1).text());
+    $("tbody tr").each(function (i) {
+        $(this).children('td:eq(0)').html(i+1);
+    });
+
+}
+
+
+// 删除单行
+function deleteCase(obj) {
+    // 判断是否已经保存进数据库   留个bug 保存后如果不刷新页面，删除的时候默认判断为未保存的
+    console.log($(obj).parent().parent().parent().attr('class'));
+    cl = $(obj).parent().parent().parent().attr('class')
+    if (cl == '' || cl == null) {
+        $(obj).parent().parent().parent().remove();
+        reOrder();
+    }else if (cl.replace(' ui-sortable-handle', '') == '' || cl.replace(' ui-sortable-handle', '') == null) {
+        $(obj).parent().parent().parent().remove();
+        reOrder();
+    } else {
+        id = cl.replace(' ui-sortable-handle', '').replace('caseId-', '');  // 获取caseId，发送请求删除
+    }
+
+}
+
 
 /*  执行测试用例的代码  */
 // 执行单条测试用例
 function runSingle(obj) {
     // 判断用例是否保存
-    cl = $(obj).parent().parent().parent().attr('class').replace(' ui-sortable-handle','');
+    cl = $(obj).parent().parent().parent().attr('class');
     if (cl == null || cl == '') {
         alert('需要先保存刷新一下才能执行');
+    }else if (cl.replace(' ui-sortable-handle', '') == '' || cl.replace(' ui-sortable-handle', '') == null) {
+        alert('需要先保存刷新一下才能执行');
     } else {
-
-
+        id = cl.replace('caseId-', '');
+        $.ajax({
+            url: '/loginInfo/runCases',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify([id]),
+            success: function (resp) {
+                $(obj).parent().parent().parent().children('td:eq(10)').html(JSON.stringify(resp));
+            }
+        });
 
     }
 }
@@ -224,38 +271,24 @@ function runSingle(obj) {
 
 
 
-
 $(document).ready(function () {
     generateTable();
 
+    // 双击可拖动,并排序
+    $(document).on("dblclick", "tbody", function () {
+        $("tbody").sortable({
+            stop: function () {
+                $('tbody tr').each(function (i) {
+                    $(this).children().eq(0).text(i + 1);
+                });
+            }
+        });
+    });
 
-    // var fixHelperModified = function(e, tr) {
-    //         //children() 方法返回返回被选元素的所有直接子元素
-    //         var $originals = tr.children();
-    //         //clone() 方法生成被选元素的副本，包含子节点、文本和属性
-    //         var $helper = tr.clone();
-    //         //each() 方法规定为每个匹配元素规定运行的函数
-    //         $helper.children().each(function(index) {
-    //             //width() 方法返回或设置匹配元素的宽度
-    //             //eq() 方法将匹配元素集缩减值指定 index 上的一个
-    //             $(this).width($originals.eq(index).width())
-    //         });
-    //         return $helper;
-    //     },
-    //     updateIndex = function(e, ui) {
-    //         //ui.item - 表示当前拖拽的元素
-    //         //parent() 获得当前匹配元素集合中每个元素的父元素，使用选择器进行筛选是可选的
-    //         $('td.index', ui.item.parent()).each(function(i) {
-    //             //html() 方法返回或设置被选元素的内容 (inner HTML)
-    //             $(this).html(i + 1);
-    //         });
-    //     };
-    // $("tbody tr").sortable({
-    //     //设置是否在拖拽元素时，显示一个辅助的元素。可选值：'original', 'clone'
-    //     helper: fixHelperModified,
-    //     //当排序动作结束时触发此事件。
-    //     stop: updateIndex
-    // }).disableSelection();
+    // 单击可编辑
+    $(document).on("click", 'tbody',function () {
+        $("tbody").sortable("destroy");
+    });
 
 
 

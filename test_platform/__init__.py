@@ -1,3 +1,5 @@
+#encoding=utf8
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from configs import env_map

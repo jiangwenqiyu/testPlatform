@@ -1,8 +1,11 @@
+#encoding=utf8
+
 from test_platform.apis import api
 from flask import request, jsonify
 from test_platform.models import TestCase
 from test_platform import db
 import json
+from test_platform.utils.run_test_case import exeCases
 
 # 获取测试用例
 @api.route('/getCases', methods=['POST'])
@@ -32,6 +35,7 @@ def getcases():
         temp['need_save'] = obj.need_save
         temp['id'] = obj.id
         temp['status'] = obj.status
+        temp['dataReqType'] = obj.reqType
         if temp['status'] == None or temp['status'] == '' or temp['status'] == 0:
             temp['updateTime'] = ''
         else:
@@ -57,21 +61,22 @@ def savecases():
             temp['name'] = content[1]
             temp['path'] = content[2]
             temp['dataType'] = content[6]
+            temp['reqType'] = content[7]
             temp['func_module_id'] = thirdId
             try:
                 temp['header'] = json.loads(content[3])
                 temp['param'] = json.loads(content[4])
                 temp['data'] = json.loads(content[5])
-                temp['exp_result'] = json.loads(content[7])
-                if content[8] == '' or content[8] == None:
-                    temp['need_save'] = content[8]
+                temp['exp_result'] = json.loads(content[8])
+                if content[9] == '' or content[9] == None:
+                    temp['need_save'] = content[9]
                 else:
-                    temp['need_save'] = json.loads(content[8])
-            except:
+                    temp['need_save'] = json.loads(content[9])
+            except Exception as e:
                 return jsonify(status='1', msg='请检查json格式')
 
             try:
-
+                print(temp)
                 case = TestCase(**temp)
                 db.session.add(case)
                 db.session.commit()
@@ -87,16 +92,17 @@ def savecases():
             temp['name'] = content[1]
             temp['path'] = content[2]
             temp['dataType'] = content[6]
+            temp['reqType'] = content[7]
             try:
                 temp['header'] = json.loads(content[3])
                 temp['param'] = json.loads(content[4])
                 temp['data'] = json.loads(content[5])
-                temp['exp_result'] = json.loads(content[7])
-                if content[8] == '' or content[8] == None:
-                    temp['need_save'] = content[8]
+                temp['exp_result'] = json.loads(content[8])
+                if content[9] == '' or content[9] == None:
+                    temp['need_save'] = content[9]
                 else:
-                    temp['need_save'] = json.loads(content[8])
-            except:
+                    temp['need_save'] = json.loads(content[9])
+            except Exception as e:
                 return jsonify(status='1', msg='请检查json格式')
             try:
                 TestCase.query.filter_by(id=caseId).update(temp)
@@ -122,19 +128,21 @@ def runTestCase():
     '''
     req_data = request.get_json()
     # 先判断，用例表是否有进行中的
-    cases = TestCase.query.filter(TestCase.id.in_(req_data)).all()
+    cases = TestCase.query.filter(TestCase.id.in_(req_data)).order_by(TestCase.caseOrder).all()
+    if cases == []:
+        return jsonify(status='1', msg='没有查询到用例')
+
+
     for i in cases:
-        print(i.name)
+        if i.status == 1:
+            return jsonify(status='1', msg='有进行中的用例')
 
-    if len(req_data) == 1:
-        pass
+    if len(req_data) == 1:  # 单条执行，返回  返回值  状态   执行时间
+        return exeCases(cases, 1, db)
     else:
-        pass
+        return exeCases(cases, 2, db)
 
 
-
-
-    return
 
 
 

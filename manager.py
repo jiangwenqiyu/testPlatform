@@ -1,3 +1,5 @@
+#encoding=utf8
+
 from test_platform import create_app, db
 from test_platform import models
 from flask_script import Manager
