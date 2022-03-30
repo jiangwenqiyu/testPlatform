@@ -266,18 +266,17 @@ function runSingle(obj) {
     }else if (cl.replace(' ui-sortable-handle', '') == '' || cl.replace(' ui-sortable-handle', '') == null) {
         alert('需要先保存刷新一下才能执行');
     } else {
-        id = cl.replace('caseId-', '');
+        id = cl.replace('caseId-', '').replace(' ui-sortable-handle', '');
         $.ajax({
             url: '/case/runCases',
             type: 'post',
-            dataType: 'json',
+            dataType: 'text',
             contentType: 'application/json',
             data: JSON.stringify([id]),
             success: function (resp) {
-                $(obj).parent().parent().parent().children('td:eq(10)').html(JSON.stringify(resp));
+                $(obj).parent().parent().parent().children('td:eq(10)').html(resp);
             }
         });
-
     }
 }
 

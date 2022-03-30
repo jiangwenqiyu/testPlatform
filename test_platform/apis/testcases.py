@@ -132,10 +132,11 @@ def runTestCase():
     if cases == []:
         return jsonify(status='1', msg='没有查询到用例')
 
-
     for i in cases:
         if i.status == 1:
             return jsonify(status='1', msg='有进行中的用例')
+
+
 
     if len(req_data) == 1:  # 单条执行，返回  返回值  状态   执行时间
         return exeCases(cases, 1, db)
