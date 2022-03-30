@@ -53,6 +53,7 @@ class TestCase(BaseModel, db.Model):
     status = db.Column(db.Integer, comment='当前用例状态 0 就绪  1 进行中  2  成功  3  失败')
 
 
+
 class ExeCaseRecord(BaseModel, db.Model):
     __tablename__ = 'exe_case_record'
     caseId = db.Column(db.Integer, db.ForeignKey('test_case.id'))
@@ -65,6 +66,10 @@ class ExeCaseRecord(BaseModel, db.Model):
 
 class User(BaseModel, db.Model):
     __tablename__ = 'user'
-    name = db.Column(db.String(20), nullable=False, unique=True)
+    account = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), nullable=False)
+    role_id = db.Column(db.String(20), nullable=False)
+
+class Role(BaseModel, db.Model):
+    __tablename__ = 'role'
+    name = db.Column(db.String(20), nullable=False)

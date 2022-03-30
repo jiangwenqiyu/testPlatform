@@ -73,10 +73,10 @@ def savecases():
                 else:
                     temp['need_save'] = json.loads(content[9])
             except Exception as e:
+                print(e)
                 return jsonify(status='1', msg='请检查json格式')
 
             try:
-                print(temp)
                 case = TestCase(**temp)
                 db.session.add(case)
                 db.session.commit()

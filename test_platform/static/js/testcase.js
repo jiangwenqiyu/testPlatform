@@ -63,7 +63,7 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
     }
 
 
-    $("table").append("<tr id='content-tr' class='caseId-" + caseId + "'>" +
+    $("table").append("<tr id='content-tr' caseid='" + caseId + "'>" +
         "<td class='index'>" + caseOrder + "</td>" +
         "<td contenteditable='true'>" + caseName + "</td>" +
         "<td contenteditable='true'>" + casePath + "</td>" +
@@ -121,13 +121,13 @@ function generateTable() {
 // 保存单条用例
 function savecase(obj) {
     var data = {};
-    // 判断当前tr的class是否有caseId-  如果有，只需更新，如果没有，则需要插入数据
-    c = $(obj).parent().parent().parent().attr('class');
+    // 判断当前tr的class是否有caseId  如果有，只需更新，如果没有，则需要插入数据
+    c = $(obj).parent().parent().parent().attr('caseid');
     if (c == null) {
         data['updateType'] = 1; // 插入数据
     } else {
         data['updateType'] = 2; // 更新数据
-        data['id'] = c.replace('caseId-', '').replace(' ui-sortable-handle', '');
+        data['id'] = c;
     }
 
     content = [];
@@ -179,13 +179,13 @@ function saveallcases() {
                 throw '必填项不能为空';
             }
             // 判断是新增还是更新
-            judge = $(this).parent().attr('class').replace(' ui-sortable-handle', '');
-            if (judge == null || judge == '') {  // 新增
+            caseid = $(this).parent().attr('caseid');
+            if (!caseid) {  // 新增
                 temp['updateType'] = 1;  // ui-sortable-handle
                 temp['id'] = null;
             } else {             // 更新
                 temp['updateType'] = 2;
-                temp['id'] = judge.replace(' ui-sortable-handle', '').replace('caseId-', '');
+                temp['id'] = caseid;
             }
             // 获取三级类id
             temp['thirdId'] = localStorage.getItem('currentthirdId');
@@ -227,15 +227,12 @@ function reOrder() {
 function deleteCase(obj) {
     // 判断是否已经保存进数据库   留个bug 保存后如果不刷新页面，删除的时候默认判断为未保存的
     console.log($(obj).parent().parent().parent().attr('class'));
-    cl = $(obj).parent().parent().parent().attr('class')
-    if (cl == '' || cl == null) {
-        $(obj).parent().parent().parent().remove();
-        reOrder();
-    }else if (cl.replace(' ui-sortable-handle', '') == '' || cl.replace(' ui-sortable-handle', '') == null) {
+    caseid = $(obj).parent().parent().parent().attr('caseid')
+    if (!caseid) {
         $(obj).parent().parent().parent().remove();
         reOrder();
     } else {
-        id = cl.replace(' ui-sortable-handle', '').replace('caseId-', '');  // 获取caseId，发送请求删除
+        id = caseid;  // 获取caseId，发送请求删除
         $.ajax({
             url: '/case/deletecase',
             type: 'post',
@@ -260,26 +257,22 @@ function deleteCase(obj) {
 // 执行单条测试用例
 function runSingle(obj) {
     // 判断用例是否保存
-    cl = $(obj).parent().parent().parent().attr('class');
-    if (cl == null || cl == '') {
-        alert('需要先保存刷新一下才能执行');
-    }else if (cl.replace(' ui-sortable-handle', '') == '' || cl.replace(' ui-sortable-handle', '') == null) {
+    caseid = $(obj).parent().parent().parent().attr('caseid');
+    if (!caseid) {
         alert('需要先保存刷新一下才能执行');
     } else {
-        id = cl.replace('caseId-', '').replace(' ui-sortable-handle', '');
         $.ajax({
             url: '/case/runCases',
             type: 'post',
             dataType: 'text',
             contentType: 'application/json',
-            data: JSON.stringify([id]),
+            data: JSON.stringify([caseid]),
             success: function (resp) {
                 $(obj).parent().parent().parent().children('td:eq(10)').html(resp);
             }
         });
     }
 }
-
 
 
 
