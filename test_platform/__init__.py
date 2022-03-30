@@ -16,7 +16,8 @@ def create_app(env):
     db.init_app(app)
 
     # 注册蓝图
-    from test_platform.apis import  api
+    from test_platform.apis import  api, api_case
     app.register_blueprint(api, url_prefix = '/loginInfo')
+    app.register_blueprint(api_case, url_prefix = '/case')
 
     return app

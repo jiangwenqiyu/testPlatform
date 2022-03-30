@@ -14,6 +14,7 @@ function insertTr() {
             "<td contenteditable='true'></td>" +
             "<td contenteditable='true'></td>" +
             "<td contenteditable='true'></td>" +
+            "<td contenteditable='true'></td>" +
             "<td></td>" +
             "<td></td>" +
             "<td></td>" +
@@ -84,7 +85,7 @@ function generateTable() {
     $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px'></table>");
     $("table").append("<thead></thead>");
     $("thead").append("<tr></tr>");
-    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型', '*请求类型','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '上次执行时间', '操作'];
+    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型/data,json', '*请求类型/get,post','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '上次执行时间', '操作'];
     for (var i = 0; i < title.length; i++) {
         if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '上次执行时间' || title[i] == '请求类型') {
             $("tr").append("<td class='short'>" + title[i] + "</td>");
@@ -97,7 +98,7 @@ function generateTable() {
     // 从接口获取数据, 插入到表体中
     var data = {'thirdId': localStorage.getItem('currentthirdId')};
     $.ajax({
-        url: '/loginInfo/getCases',
+        url: '/case/getCases',
         type: 'post',
         contentType: 'application/json',
         dataType: 'json',
@@ -148,7 +149,7 @@ function savecase(obj) {
 
 
     $.ajax({
-        url:'/loginInfo/saveCases',
+        url:'/case/saveCases',
         type: 'post',
         contentType: 'application/json',
         dataType: 'json',
@@ -178,8 +179,8 @@ function saveallcases() {
                 throw '必填项不能为空';
             }
             // 判断是新增还是更新
-            judge = $(this).parent().attr('class');
-            if (judge == null) {  // 新增
+            judge = $(this).parent().attr('class').replace(' ui-sortable-handle', '');
+            if (judge == null || judge == '') {  // 新增
                 temp['updateType'] = 1;  // ui-sortable-handle
                 temp['id'] = null;
             } else {             // 更新
@@ -197,7 +198,7 @@ function saveallcases() {
     });
 
     $.ajax({
-        url:'/loginInfo/saveCases',
+        url:'/case/saveCases',
         type: 'post',
         contentType: 'application/json',
         dataType: 'json',
@@ -210,8 +211,6 @@ function saveallcases() {
             }
         }
     });
-
-
 }
 
 
@@ -221,11 +220,10 @@ function reOrder() {
     $("tbody tr").each(function (i) {
         $(this).children('td:eq(0)').html(i+1);
     });
-
 }
 
 
-// 删除单行
+// 删除测试用例
 function deleteCase(obj) {
     // 判断是否已经保存进数据库   留个bug 保存后如果不刷新页面，删除的时候默认判断为未保存的
     console.log($(obj).parent().parent().parent().attr('class'));
@@ -238,8 +236,23 @@ function deleteCase(obj) {
         reOrder();
     } else {
         id = cl.replace(' ui-sortable-handle', '').replace('caseId-', '');  // 获取caseId，发送请求删除
+        $.ajax({
+            url: '/case/deletecase',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({'id':id}),
+            success: function (resp) {
+                if (resp.status != '0') {
+                    alert(resp.msg);
+                } else {
+                    $(obj).parent().parent().parent().remove();
+                    reOrder();
+                    alert('删除成功');
+                }
+            }
+        })
     }
-
 }
 
 
@@ -255,7 +268,7 @@ function runSingle(obj) {
     } else {
         id = cl.replace('caseId-', '');
         $.ajax({
-            url: '/loginInfo/runCases',
+            url: '/case/runCases',
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',

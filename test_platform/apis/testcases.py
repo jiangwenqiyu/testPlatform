@@ -1,6 +1,6 @@
 #encoding=utf8
 
-from test_platform.apis import api
+from test_platform.apis import api_case
 from flask import request, jsonify
 from test_platform.models import TestCase
 from test_platform import db
@@ -8,7 +8,7 @@ import json
 from test_platform.utils.run_test_case import exeCases
 
 # 获取测试用例
-@api.route('/getCases', methods=['POST'])
+@api_case.route('/getCases', methods=['POST'])
 def getcases():
     """
     接受参数： 二级模块id secondId，三级模块id thirdId
@@ -46,7 +46,7 @@ def getcases():
 
 
 # 保存测试用例
-@api.route('/saveCases', methods=['POST'])
+@api_case.route('/saveCases', methods=['POST'])
 def savecases():
     req_data_list = request.get_json()
     for req_data in req_data_list:
@@ -117,7 +117,7 @@ def savecases():
 
 
 # 执行测试用例
-@api.route('/runCases', methods=['POST'])
+@api_case.route('/runCases', methods=['POST'])
 def runTestCase():
     '''
     接收测试用例[用例id]
@@ -141,6 +141,25 @@ def runTestCase():
         return exeCases(cases, 1, db)
     else:
         return exeCases(cases, 2, db)
+
+
+# 删除测试用例
+@api_case.route('/deletecase', methods = ['POST'])
+def deletecase():
+    '''
+    :param id:
+    :return:
+    '''
+
+    req_data = request.get_json()
+    id = req_data.get('id')
+    try:
+        case = TestCase.query.filter_by(id=id).delete()
+    except:
+        return jsonify(status='1', msg='访问数据库失败')
+
+    db.session.commit()
+    return jsonify(status='0', msg='删除成功')
 
 
 
