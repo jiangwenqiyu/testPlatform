@@ -274,6 +274,30 @@ function runSingle(obj) {
     }
 }
 
+// 执行所有用例
+function runallcases() {
+    ids = [];
+    $('table tbody').children().each(function (i) {
+        caseid = $(this).attr('caseid');
+        if (!caseid) {
+            console.log(i);
+            alert('有未保存的用例,需要先保存再刷新一下');
+            throw '有未保存的用例,需要先保存再刷新一下';
+        }
+        ids.push(caseid);
+    });
+
+    $.ajax({
+        url: '/case/runCases',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify(ids),
+        success:''
+
+    });
+
+}
+
 
 
 $(document).ready(function () {

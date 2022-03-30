@@ -51,6 +51,7 @@ class TestCase(BaseModel, db.Model):
     caseOrder = db.Column(db.Integer, nullable=False, comment='用例执行顺序')
     func_module_id = db.Column(db.Integer, db.ForeignKey("func_module.id"), comment='三级模块的id')
     status = db.Column(db.Integer, comment='当前用例状态 0 就绪  1 进行中  2  成功  3  失败')
+    res = db.Column(db.JSON)
 
 
 
@@ -69,6 +70,7 @@ class User(BaseModel, db.Model):
     account = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
     role_id = db.Column(db.String(20), nullable=False)
+
 
 class Role(BaseModel, db.Model):
     __tablename__ = 'role'

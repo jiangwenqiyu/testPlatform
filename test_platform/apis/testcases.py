@@ -141,7 +141,7 @@ def runTestCase():
     if len(req_data) == 1:  # 单条执行，返回  返回值  状态   执行时间
         return exeCases(cases, 1, db)
     else:
-        return exeCases(cases, 2, db)
+        return jsonify(status='0', msg=exeCases(cases, 2, db))
 
 
 # 删除测试用例
