@@ -45,7 +45,7 @@ function insertTr() {
 }
 
 // 向table插入数据
-function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseDataType,exp,save,caseId, status, updateTime, caseReqType) {
+function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseDataType,exp,save,caseId, status, updateTime, caseReqType, res) {
     caseHeader = JSON.stringify(caseHeader);
     caseData = JSON.stringify(caseData);
     param = JSON.stringify(param);
@@ -74,7 +74,7 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
         "<td contenteditable='true'>" + caseReqType + "</td>" +
         "<td contenteditable='true'>" + exp + "</td>" +
         "<td contenteditable='true'>" + save + "</td>" +
-        "<td></td>" +
+        "<td>" + res + "</td>" +
         "<td>" + status + "</td>" +
         "<td>" + updateTime + "</td>" +
         "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a  href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a  href='javascript:;' onclick='deleteCase(this);'>删除</a></div></td></tr>");
@@ -85,9 +85,9 @@ function generateTable() {
     $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px'></table>");
     $("table").append("<thead></thead>");
     $("thead").append("<tr></tr>");
-    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型/data,json', '*请求类型/get,post','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '上次执行时间', '操作'];
+    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型/data,json', '*请求类型/get,post','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '更新时间', '操作'];
     for (var i = 0; i < title.length; i++) {
-        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '上次执行时间' || title[i] == '请求类型') {
+        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '更新时间' || title[i] == '请求类型') {
             $("tr").append("<td class='short'>" + title[i] + "</td>");
         } else if (title[i] == '用例名称' || title[i] == '预期结果' || title[i] == '需要保存的对象') {
             $("tr").append("<td class='middle'>" + title[i] + "</td>");
@@ -109,7 +109,7 @@ function generateTable() {
             } else {
                 data = resp.data;
                 for (var i = 0; i < data.length; i++) {
-                    insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id, data[i].status, data[i].updateTime, data[i].dataReqType);
+                    insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id, data[i].status, data[i].updateTime, data[i].dataReqType, data[i].res);
                 }
 
 
@@ -264,11 +264,11 @@ function runSingle(obj) {
         $.ajax({
             url: '/case/runCases',
             type: 'post',
-            dataType: 'text',
+            dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify([caseid]),
             success: function (resp) {
-                $(obj).parent().parent().parent().children('td:eq(10)').html(resp);
+                $(obj).parent().parent().parent().children('td:eq(10)').html(resp.msg);
             }
         });
     }
@@ -290,14 +290,16 @@ function runallcases() {
     $.ajax({
         url: '/case/runCases',
         type: 'post',
+        dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify(ids),
-        success:''
+        success: function (resp) {
+            alert(resp.msg);
+            console.log(resp);
 
+        }
     });
-
 }
-
 
 
 $(document).ready(function () {

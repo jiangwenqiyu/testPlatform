@@ -36,10 +36,8 @@ def getcases():
         temp['id'] = obj.id
         temp['status'] = obj.status
         temp['dataReqType'] = obj.reqType
-        if temp['status'] == None or temp['status'] == '' or temp['status'] == 0:
-            temp['updateTime'] = ''
-        else:
-            temp['updateTime'] = obj.updateTime
+        temp['updateTime'] = obj.updateTime
+        temp['res'] = obj.res
         data.append(temp)
 
     return jsonify(status='0', msg='', data = data)
@@ -139,7 +137,7 @@ def runTestCase():
 
 
     if len(req_data) == 1:  # 单条执行，返回  返回值  状态   执行时间
-        return exeCases(cases, 1, db)
+        return jsonify(status='0', msg = exeCases(cases, 1, db))
     else:
         return jsonify(status='0', msg=exeCases(cases, 2, db))
 

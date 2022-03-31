@@ -57,12 +57,27 @@ class TestCase(BaseModel, db.Model):
 
 class ExeCaseRecord(BaseModel, db.Model):
     __tablename__ = 'exe_case_record'
+    recordNo = db.Column(db.String(30), nullable=False)
+
+
+class ExeCaseRecordDetail(BaseModel, db.Model):
+    __tablename__ = 'exe_case_record_detail'
+    recordNo = db.Column(db.String(30), nullable=False)
     caseId = db.Column(db.Integer, db.ForeignKey('test_case.id'))
-    consume = db.Column(db.String(10), nullable=False)
-    data = db.Column(db.JSON, nullable=False)
-    res = db.Column(db.JSON, nullable=False)
-    success = db.Column(db.Integer, nullable=False, comment='用例执行是否成功 1 成功  2 失败')
-    env_name = db.Column(db.String(10), nullable=False)
+    caseName = db.Column(db.String(10), nullable=False, comment='用例名称')
+    consume = db.Column(db.String(10), comment='请求耗时')
+    data = db.Column(db.JSON, nullable=False, comment='入参')
+    res = db.Column(db.JSON, comment='返回值')
+    success = db.Column(db.Integer, nullable=False, comment='用例执行是否成功 0 未开始 1 成功  2 失败')
+    env_id = db.Column(db.String(10), nullable=False, comment='环境id')
+
+
+class WaitExeCase(BaseModel, db.Model):
+    __tablename__ = 'wait_exe_case'
+    recordNo = db.Column(db.String(30), nullable=False)
+    caseId = db.Column(db.Integer, db.ForeignKey('test_case.id'))
+    caseOrder = db.Column(db.Integer, nullable=False)
+
 
 
 class User(BaseModel, db.Model):
