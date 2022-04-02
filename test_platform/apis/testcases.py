@@ -37,7 +37,7 @@ def getcases():
         temp['status'] = obj.status
         temp['dataReqType'] = obj.reqType
         temp['updateTime'] = obj.updateTime
-        temp['res'] = obj.res
+        temp['res'] = str(obj.res)
         data.append(temp)
 
     return jsonify(status='0', msg='', data = data)

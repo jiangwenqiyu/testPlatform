@@ -54,8 +54,10 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
     // 转换状态为中文
     if (status == '0' || status == null || status == '') {
         status = '就绪';
-    }else if (status == '0') {
-
+    }else if (status == '2') {
+        status = '成功';
+    }else if (status == '3') {
+        status = '失败';
     }
 
     if (save == null) {

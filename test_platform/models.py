@@ -60,6 +60,7 @@ class ExeCaseRecord(BaseModel, db.Model):
     recordNo = db.Column(db.String(30), nullable=False)
 
 
+
 class ExeCaseRecordDetail(BaseModel, db.Model):
     __tablename__ = 'exe_case_record_detail'
     recordNo = db.Column(db.String(30), nullable=False)
@@ -68,8 +69,9 @@ class ExeCaseRecordDetail(BaseModel, db.Model):
     consume = db.Column(db.String(10), comment='请求耗时')
     data = db.Column(db.JSON, nullable=False, comment='入参')
     res = db.Column(db.JSON, comment='返回值')
-    success = db.Column(db.Integer, nullable=False, comment='用例执行是否成功 0 未开始 1 成功  2 失败')
+    status = db.Column(db.Integer, nullable=False, comment='用例执行是否成功 0 未开始 1 成功  2 失败')
     env_id = db.Column(db.String(10), nullable=False, comment='环境id')
+
 
 
 class WaitExeCase(BaseModel, db.Model):
@@ -87,6 +89,11 @@ class User(BaseModel, db.Model):
     role_id = db.Column(db.String(20), nullable=False)
 
 
+
 class Role(BaseModel, db.Model):
     __tablename__ = 'role'
     name = db.Column(db.String(20), nullable=False)
+
+
+
+

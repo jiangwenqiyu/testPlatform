@@ -3,7 +3,10 @@ import re
 import requests
 import jmespath
 import time
+import json
 from test_platform.models import TestCase, ExeCaseRecord, ExeCaseRecordDetail, WaitExeCase
+from test_platform import redis_store, constance, db
+from sqlalchemy import and_
 
 def exeCases(cases,exeType, db):
     '''
@@ -80,7 +83,7 @@ def exeCases(cases,exeType, db):
                 temp['caseId'] = case.id
                 temp['caseName'] = case.name
                 temp['data'] = case.data
-                temp['success'] = 0
+                temp['status'] = 0
                 temp['env_id'] = 0
                 db.session.add(ExeCaseRecordDetail(**temp))
 
@@ -95,7 +98,7 @@ def exeCases(cases,exeType, db):
             db.session.rollback()
             return '执行失败，{}'.format(e)
 
-        BatchExeCases().run()
+        BatchExeCases().run()  # 后台执行
         return '执行成功，刷新查看后台执行结果'
 
 
@@ -104,12 +107,16 @@ class BatchExeCases:
 
     def run(self):
         # 从待执行表获取用例
-        w_cases = WaitExeCase.query.order_by(and_(WaitExeCase.recordNo, WaitExeCase.caseOrder)).all()
+        w_cases = WaitExeCase.query.outerjoin(TestCase, TestCase.id == WaitExeCase.caseId).order_by(and_(WaitExeCase.recordNo, WaitExeCase.caseOrder)).all()
+        for wcase in w_cases:
+            case = TestCase.query.filter_by(id=wcase.caseId).first()
+            self.exeCase(case)
 
 
     def exeCase(self, case):
-        # 判断param和data，是否有需要提取的数据
-
+        # param和data，清洗出需要获取上个接口的数据
+        param = self.extractData(case.param, case.func_module_id, case.caseOrder)
+        data = self.extractData(case.data, case.func_module_id, case.caseOrder)
 
         try:
             if case.reqType.upper() == 'GET':
@@ -120,15 +127,57 @@ class BatchExeCases:
                 elif case.dataType.upper() == 'JSON':
                     res = requests.post(case.path, headers = case.header, params=case.param, json=case.data)
         except Exception as e:
-            pass
+            self.failure(case, str(e))
         else:
-            # 如果有需要保存的值，存入redis
-            pass
+            # 请求成功，断言，通过之后把res存入redis，断言失败执行failure
+            try:
+                for jmes in case.exp_result:
+                    assert res.json()[jmes] == case.exp_result[jmes], '断言失败\n断言数据:{}\n期望:{}\n实际:{}'.format(jmes, case.exp_result[jmes], res.json()[jmes])
+            except Exception as e:
+                self.failure(case, str(e))
+            else:
+                self.success(case, res)
 
-    def extractData(self, data):
+
+    def extractData(self, data, module_id, caseorder):
         # 数据格式  #用例序号.jmespath#
-        # redis格式：模块id_用例序号_jmespah:值
-        pat = '#\d+\..*#'
+        # redis格式：模块id_用例序号:值
+        pat = '#\d+\..*?#'
+        data = json.dumps(data, ensure_ascii=False)
+        result = re.findall(pat, data)
+        if len(result) == 0:
+            return json.loads(data)
+        else:
+            for value in result:
+                value = value.replace('#', '')
+                jmespath_express = re.sub('^\d+\.', '', value)
+                last_res = json.loads(redis_store.get('{}_{}'.format(module_id, caseorder)))
+                last_value = jmespath.search(jmespath_express, last_res)
+                data = data.replace(value, last_value)
+            return json.loads(data)
+
+    def failure(self, case, e):
+        # 更新用例表  status  3  res  e
+        TestCase.query.filter_by(id=case.id).update({'status':3, 'res':e  })
+        # 更新批次明细表  consume  res  success 2
+        ExeCaseRecordDetail.query.filter_by(caseId=case.id).update({'status':2, 'consume':'0'})
+        # 从待执行表删除
+        WaitExeCase.query.filter_by(caseId=case.id).delete()
+        db.session.commit()
+
+        return
+
+    def success(self, case, res):
+        # 把res存入redis, 格式  模块id_order:res
+        redis_store.setex('{}_{}'.format(case.func_module_id, case.caseOrder), constance.REDIS_EXPIRE_TIME, json.dumps(res.json(), ensure_ascii=False))
+        # 更新用例表  status  2  res
+        TestCase.query.filter_by(id=case.id).update({'status':2, 'res':res.json()})
+        # 更新批次明细表  consume  res  success 1
+        ExeCaseRecordDetail.query.filter_by(caseId=case.id).update({'status':1, 'consume':res.elapsed.total_seconds()})
+        # 从待执行表删除
+        WaitExeCase.query.filter_by(caseId=case.id).delete()
+        db.session.commit()
+        return
 
 
 

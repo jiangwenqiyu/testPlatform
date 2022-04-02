@@ -1,10 +1,5 @@
-import re
-
-url = '#1.status#'
-pat = '#\d+\..*#'
-a = re.findall(pat, url)
-print(a)
+import requests
 
 
-
-
+res = requests.get()
+res.elapsed.total_seconds()
