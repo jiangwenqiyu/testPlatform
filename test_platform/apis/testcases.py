@@ -153,12 +153,13 @@ def deletecase():
     req_data = request.get_json()
     id = req_data.get('id')
     try:
-        case = TestCase.query.filter_by(id=id).delete()
-    except:
+        cas = TestCase.query.filter_by(id=id).delete()
+        db.session.commit()
+        return jsonify(status='0', msg='删除成功')
+    except Exception as e:
+        db.session.rollback()
         return jsonify(status='1', msg='访问数据库失败')
 
-    db.session.commit()
-    return jsonify(status='0', msg='删除成功')
 
 
 

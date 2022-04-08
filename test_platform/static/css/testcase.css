@@ -1,51 +1,41 @@
-/*html body {*/
-/*    padding: 100%;*/
-/*    margin: 100%;*/
-/*}*/
-
-#case {
-    overflow: scroll;
-
-}
-
-table {
-    table-layout: fixed;
-}
-table tr {
-    height: 20px;
-    overflow: hidden;
-    cursor: pointer;
-}
-#content-tr {
-    max-height: 60px;
-}
-
-table td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #B9B9B9;
-}
-
-.short {
-    padding-right: 5px;
-    padding-left: 5px;
-    color: orange;
-}
-
-.middle {
-    padding-right: 80px;
-    padding-left: 80px;
-    color: orange;
-}
-
-.long {
-    padding-right: 150px;
-    padding-left: 150px;
-    color: orange;
-}
-
 a {
     color: greenyellow;
     text-decoration: none;
 }
+
+#case {
+    overflow: scroll;
+}
+
+.content-tr {
+    max-height: 60px;
+}
+
+td {
+    color: #B9B9B9;
+}
+
+/*td {*/
+/*    word-break:keep-all;*/
+/*    white-space: nowrap;*/
+/*    color: #B9B9B9;*/
+/*    overflow: hidden;*/
+/*    text-overflow: ellipsis;*/
+/*    max-width: 300px;*/
+/*}*/
+/*td {*/
+/*    color: #B9B9B9;*/
+/*    !*word-break:keep-all;*!*/
+/*    !*white-space: nowrap;*!*/
+/*    overflow: hidden;*/
+/*    text-overflow: ellipsis;*/
+/*    height: 100px;*/
+/*}*/
+
+
+
+
+
+
+
+

@@ -7,6 +7,7 @@ import json
 from test_platform.models import TestCase, ExeCaseRecord, ExeCaseRecordDetail, WaitExeCase
 from test_platform import redis_store, constance, db
 from sqlalchemy import and_
+from test_platform.utils.extractFuncs import ishave
 
 def exeCases(cases,exeType, db):
     '''
@@ -64,8 +65,9 @@ def exeCases(cases,exeType, db):
     else:
         # 批量执行，直接先插入待执行表，后台执行
 
-        # 更新用例表，status，为执行中
+
         try:
+            # 更新用例表，status，为执行中
             caseids = []
             for case in cases:
                 caseids.append(case.id)
@@ -115,31 +117,36 @@ class BatchExeCases:
 
     def exeCase(self, case):
         # param和data，清洗出需要获取上个接口的数据
-        param = self.extractData(case.param, case.func_module_id, case.caseOrder)
-        data = self.extractData(case.data, case.func_module_id, case.caseOrder)
+        param = self.extractData(case.param, case.func_module_id,)
+        data = self.extractData(case.data, case.func_module_id)
+
+        if param == '提取上一接口数据失败' or data == '提取上一接口数据失败':
+            self.failure(case, '提取上一接口数据失败', data)
+            return
+        data = ishave(data)
 
         try:
             if case.reqType.upper() == 'GET':
-                res = requests.get(case.path, headers = case.header, params=case.param)
+                res = requests.get(case.path, headers = case.header, params=param)
             elif case.reqType.upper() == 'POST':
                 if case.dataType.upper() == 'DATA':
-                    res = requests.post(case.path, headers = case.header, params=case.param, data=case.data)
+                    res = requests.post(case.path, headers = case.header, params=param, data=data)
                 elif case.dataType.upper() == 'JSON':
-                    res = requests.post(case.path, headers = case.header, params=case.param, json=case.data)
+                    res = requests.post(case.path, headers = case.header, params=param, json=data)
         except Exception as e:
-            self.failure(case, str(e))
+            self.failure(case, str(e), data)
         else:
             # 请求成功，断言，通过之后把res存入redis，断言失败执行failure
             try:
                 for jmes in case.exp_result:
                     assert res.json()[jmes] == case.exp_result[jmes], '断言失败\n断言数据:{}\n期望:{}\n实际:{}'.format(jmes, case.exp_result[jmes], res.json()[jmes])
             except Exception as e:
-                self.failure(case, str(e))
+                self.failure(case, res.text, data)
             else:
-                self.success(case, res)
+                self.success(case, res, data)
 
 
-    def extractData(self, data, module_id, caseorder):
+    def extractData(self, data, module_id):
         # 数据格式  #用例序号.jmespath#
         # redis格式：模块id_用例序号:值
         pat = '#\d+\..*?#'
@@ -148,32 +155,37 @@ class BatchExeCases:
         if len(result) == 0:
             return json.loads(data)
         else:
-            for value in result:
-                value = value.replace('#', '')
-                jmespath_express = re.sub('^\d+\.', '', value)
-                last_res = json.loads(redis_store.get('{}_{}'.format(module_id, caseorder)))
-                last_value = jmespath.search(jmespath_express, last_res)
-                data = data.replace(value, last_value)
-            return json.loads(data)
+            try:
+                for value in result:
+                    value1 = value.replace('#', '')
+                    caseorder = re.findall('(^\d+)\.', value1)[0]
+                    jmespath_express = value1.replace(caseorder + '.', '')
+                    last_res = json.loads(redis_store.get('{}_{}'.format(module_id, caseorder)))
+                    last_value = jmespath.search(jmespath_express, last_res)
+                    data = data.replace(value, last_value)
+                return json.loads(data)
+            except:
+                return '提取上一接口数据失败'
 
-    def failure(self, case, e):
+
+    def failure(self, case, e, data):
         # 更新用例表  status  3  res  e
         TestCase.query.filter_by(id=case.id).update({'status':3, 'res':e  })
         # 更新批次明细表  consume  res  success 2
-        ExeCaseRecordDetail.query.filter_by(caseId=case.id).update({'status':2, 'consume':'0'})
+        ExeCaseRecordDetail.query.filter_by(caseId=case.id).update({'status':2, 'consume':'0', 'res':e})
         # 从待执行表删除
         WaitExeCase.query.filter_by(caseId=case.id).delete()
         db.session.commit()
 
         return
 
-    def success(self, case, res):
+    def success(self, case, res, data):
         # 把res存入redis, 格式  模块id_order:res
         redis_store.setex('{}_{}'.format(case.func_module_id, case.caseOrder), constance.REDIS_EXPIRE_TIME, json.dumps(res.json(), ensure_ascii=False))
         # 更新用例表  status  2  res
         TestCase.query.filter_by(id=case.id).update({'status':2, 'res':res.json()})
         # 更新批次明细表  consume  res  success 1
-        ExeCaseRecordDetail.query.filter_by(caseId=case.id).update({'status':1, 'consume':res.elapsed.total_seconds()})
+        ExeCaseRecordDetail.query.filter_by(caseId=case.id).update({'status':1, 'consume':res.elapsed.total_seconds(), 'res':res.json()})
         # 从待执行表删除
         WaitExeCase.query.filter_by(caseId=case.id).delete()
         db.session.commit()

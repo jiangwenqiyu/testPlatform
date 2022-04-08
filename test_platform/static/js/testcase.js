@@ -4,7 +4,7 @@ function insertTr() {
     // 如果没有用例则排序为1
     if ($("table tbody tr").length == 0) {
 
-        $("table").append("<tr id='content-tr'>" +
+        $("table").append("<tr class='content-tr'>" +
             "<td class='index'>1</td>" +
             "<td contenteditable='true'></td>" +
             "<td contenteditable='true'></td>" +
@@ -26,7 +26,7 @@ function insertTr() {
         // 获取最后一行的排序，+1给添加的下一行
         maxOrder = parseInt($("table").find('tr:eq(' + ($("table tr").length - 1).toString() + ')').find('td:eq(0)').text()) + 1;
 
-        $("table").append("<tr id='content-tr'>" +
+        $("table").append("<tr class='content-tr'>" +
             "<td class='index'>" + maxOrder + "</td>" +
             "<td contenteditable='true'></td>" +
             "<td contenteditable='true'></td>" +
@@ -64,7 +64,6 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
         save = '';
     }
 
-
     $("table").append("<tr id='content-tr' caseid='" + caseId + "'>" +
         "<td class='index'>" + caseOrder + "</td>" +
         "<td contenteditable='true'>" + caseName + "</td>" +
@@ -84,19 +83,15 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
 
 function generateTable() {
     // 生成表格
-    $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px'></table>");
+    $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px;table-layout: fixed'></table>");
     $("table").append("<thead></thead>");
     $("thead").append("<tr></tr>");
     var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型/data,json', '*请求类型/get,post','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '更新时间', '操作'];
+
     for (var i = 0; i < title.length; i++) {
-        if (title[i] == '序号' || title[i] == '入参类型' || title[i] == '操作' || title[i] == '上次执行状态' || title[i] == '更新时间' || title[i] == '请求类型') {
-            $("tr").append("<td class='short'>" + title[i] + "</td>");
-        } else if (title[i] == '用例名称' || title[i] == '预期结果' || title[i] == '需要保存的对象') {
-            $("tr").append("<td class='middle'>" + title[i] + "</td>");
-        } else {
-            $("tr").append("<td class='long'>" + title[i] + "</td>");
-        }
+        $("tr").append("<td style='color: orange;white-space: nowrap;' >" + title[i] + "</td>");
     }
+
     // 从接口获取数据, 插入到表体中
     var data = {'thirdId': localStorage.getItem('currentthirdId')};
     $.ajax({
@@ -113,8 +108,6 @@ function generateTable() {
                 for (var i = 0; i < data.length; i++) {
                     insertData(data[i].caseOrder, data[i].name, data[i].path, data[i].header, data[i].param, data[i].data, data[i].dataType,data[i].exp_result,data[i].need_save,data[i].id, data[i].status, data[i].updateTime, data[i].dataReqType, data[i].res);
                 }
-
-
             }
         }
     });
@@ -258,6 +251,9 @@ function deleteCase(obj) {
 /*  执行测试用例的代码  */
 // 执行单条测试用例
 function runSingle(obj) {
+    // 清空执行状态
+
+
     // 判断用例是否保存
     caseid = $(obj).parent().parent().parent().attr('caseid');
     if (!caseid) {

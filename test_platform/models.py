@@ -64,7 +64,7 @@ class ExeCaseRecord(BaseModel, db.Model):
 class ExeCaseRecordDetail(BaseModel, db.Model):
     __tablename__ = 'exe_case_record_detail'
     recordNo = db.Column(db.String(30), nullable=False)
-    caseId = db.Column(db.Integer, db.ForeignKey('test_case.id'))
+    caseId = db.Column(db.Integer)
     caseName = db.Column(db.String(10), nullable=False, comment='用例名称')
     consume = db.Column(db.String(10), comment='请求耗时')
     data = db.Column(db.JSON, nullable=False, comment='入参')
