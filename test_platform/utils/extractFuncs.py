@@ -17,7 +17,7 @@ def ishave(data):
 
 
 def radnint():
-    a = str(random.randint(0,100))
+    a = str(random.randint(0,100000))
 
     return a
 

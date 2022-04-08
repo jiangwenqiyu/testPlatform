@@ -44,8 +44,9 @@ html, body {
     height: 100%;
     width: 85%;
     float: left;
-    /*background-color: antiquewhite;  背景颜色米黄色*/
-    background-color: #404040;
+    /*background-color: antiquewhite;  // 背景颜色米黄色*/
+    /*background-color: #404040;*/
+    background-color: #FFFFFF;
     margin: 0;
     padding: 0;
 }

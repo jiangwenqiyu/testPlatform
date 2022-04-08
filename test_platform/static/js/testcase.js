@@ -86,10 +86,10 @@ function generateTable() {
     $("div").append("<table border='1' cellspacing='0' style='margin-top: 10px;table-layout: fixed'></table>");
     $("table").append("<thead></thead>");
     $("thead").append("<tr></tr>");
-    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型/data,json', '*请求类型/get,post','*预期结果', '需要保存的对象', '返回值', '上次执行状态', '更新时间', '操作'];
+    var title = ['序号','*用例名称', '*用例路径', '*请求头', 'params', '入参', '*入参类型/data,json', '*请求类型/get,post','*预期结果', '执行后等待时间s', '返回值', '上次执行状态', '更新时间', '操作'];
 
     for (var i = 0; i < title.length; i++) {
-        $("tr").append("<td style='color: orange;white-space: nowrap;' >" + title[i] + "</td>");
+        $("tr").append("<td style='color: orange;white-space: nowrap;'>" + title[i] + "</td>");
     }
 
     // 从接口获取数据, 插入到表体中
@@ -139,7 +139,6 @@ function savecase(obj) {
     // 把遍历的结果传入data
     data['content'] = content;
     // 把三级模块id传入data
-    console.log(localStorage.getItem('currentthirdId'));
     data['thirdId'] = localStorage.getItem('currentthirdId');
 
 
@@ -153,6 +152,10 @@ function savecase(obj) {
             if (resp.status != '0') {
                 alert(resp.msg);
             } else {
+                if (data['updateType'] == 1) {
+                    $(obj).parent().parent().parent().attr("class", resp.caseid);
+                    console.log($(obj).parent().parent().parent());
+                }
                 alert('保存成功！');
             }
         }

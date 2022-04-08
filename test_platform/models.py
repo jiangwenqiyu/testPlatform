@@ -38,7 +38,7 @@ class EnvConfig(BaseModel, db.Model):
 
 class TestCase(BaseModel, db.Model):
     __tablename__ = 'test_case'
-    name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     path = db.Column(db.String(150), nullable=False)
     header = db.Column(db.JSON, nullable=False)
     param = db.Column(db.JSON)
@@ -65,8 +65,8 @@ class ExeCaseRecordDetail(BaseModel, db.Model):
     __tablename__ = 'exe_case_record_detail'
     recordNo = db.Column(db.String(30), nullable=False)
     caseId = db.Column(db.Integer)
-    caseName = db.Column(db.String(10), nullable=False, comment='用例名称')
-    consume = db.Column(db.String(10), comment='请求耗时')
+    caseName = db.Column(db.String(50), nullable=False, comment='用例名称')
+    consume = db.Column(db.String(15), comment='请求耗时')
     data = db.Column(db.JSON, nullable=False, comment='入参')
     res = db.Column(db.JSON, comment='返回值')
     status = db.Column(db.Integer, nullable=False, comment='用例执行是否成功 0 未开始 1 成功  2 失败')

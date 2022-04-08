@@ -78,6 +78,7 @@ def savecases():
                 case = TestCase(**temp)
                 db.session.add(case)
                 db.session.commit()
+                return jsonify(status='0', msg='', casdid = case.id)
             except:
                 db.session.rollback()
                 return jsonify(status='1', msg='数据库更新失败')
@@ -105,13 +106,14 @@ def savecases():
             try:
                 TestCase.query.filter_by(id=caseId).update(temp)
                 db.session.commit()
+                return jsonify(status='0', msg='')
             except Exception as e:
                 db.session.rollback()
                 print(e)
                 return jsonify(status='1', msg='数据库更新失败')
 
 
-    return jsonify(status='0', msg='')
+
 
 
 # 执行测试用例

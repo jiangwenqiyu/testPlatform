@@ -98,6 +98,7 @@ def exeCases(cases,exeType, db):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            print(e)
             return '执行失败，{}'.format(e)
 
         BatchExeCases().run()  # 后台执行
@@ -119,6 +120,7 @@ class BatchExeCases:
         # param和data，清洗出需要获取上个接口的数据
         param = self.extractData(case.param, case.func_module_id,)
         data = self.extractData(case.data, case.func_module_id)
+        exp_result = self.extractData(case.exp_result, case.func_module_id)
 
         if param == '提取上一接口数据失败' or data == '提取上一接口数据失败':
             self.failure(case, '提取上一接口数据失败', data)
@@ -136,10 +138,10 @@ class BatchExeCases:
         except Exception as e:
             self.failure(case, str(e), data)
         else:
-            # 请求成功，断言，通过之后把res存入redis，断言失败执行failure
+            # 请求成功，断言，通过之后把res、入参  存入redis，断言失败执行failure
             try:
-                for jmes in case.exp_result:
-                    assert res.json()[jmes] == case.exp_result[jmes], '断言失败\n断言数据:{}\n期望:{}\n实际:{}'.format(jmes, case.exp_result[jmes], res.json()[jmes])
+                for jmes in exp_result:
+                    assert jmespath.search(jmes, res.json()) == exp_result[jmes], '断言失败\n断言数据:{}\n期望:{}\n实际:{}'.format(jmes, exp_result[jmes], res.json()[jmes])
             except Exception as e:
                 self.failure(case, res.text, data)
             else:
@@ -147,25 +149,34 @@ class BatchExeCases:
 
 
     def extractData(self, data, module_id):
-        # 数据格式  #用例序号.jmespath#
-        # redis格式：模块id_用例序号:值
-        pat = '#\d+\..*?#'
+        # 数据格式  #用例序号.res|data_jmespath#
+        # redis格式：模块id_用例序号_res|data:值
+        pat = '#(\d+)\.(.*?)\.(.*?)#'
         data = json.dumps(data, ensure_ascii=False)
         result = re.findall(pat, data)
+
         if len(result) == 0:
             return json.loads(data)
         else:
             try:
                 for value in result:
-                    value1 = value.replace('#', '')
-                    caseorder = re.findall('(^\d+)\.', value1)[0]
-                    jmespath_express = value1.replace(caseorder + '.', '')
-                    last_res = json.loads(redis_store.get('{}_{}'.format(module_id, caseorder)))
-                    last_value = jmespath.search(jmespath_express, last_res)
-                    data = data.replace(value, last_value)
+                    order = value[0]
+                    typ = value[1]
+                    jmes = value[2]
+                    if typ == 'res':
+                        last_res = json.loads(redis_store.get('{}_{}_res'.format(module_id, order)))
+                    elif typ == 'data':
+                        last_res = json.loads(redis_store.get('{}_{}_data'.format(module_id, order)))
+                    else:
+                        raise Exception("预期结果提取格式不对")
+                    last_value = jmespath.search(jmes, last_res)
+                    data = data.replace('#{}.{}.{}#'.format(order, typ, jmes), last_value)
                 return json.loads(data)
-            except:
-                return '提取上一接口数据失败'
+            except Exception as e:
+                if str(e) != '预期结果提取格式不对':
+                    return '提取上一接口数据失败'
+                else:
+                    return str(e)
 
 
     def failure(self, case, e, data):
@@ -181,7 +192,9 @@ class BatchExeCases:
 
     def success(self, case, res, data):
         # 把res存入redis, 格式  模块id_order:res
-        redis_store.setex('{}_{}'.format(case.func_module_id, case.caseOrder), constance.REDIS_EXPIRE_TIME, json.dumps(res.json(), ensure_ascii=False))
+        redis_store.setex('{}_{}_res'.format(case.func_module_id, case.caseOrder), constance.REDIS_EXPIRE_TIME, json.dumps(res.json(), ensure_ascii=False))
+        # 把res存入redis, 格式  模块id_order:res
+        redis_store.setex('{}_{}_data'.format(case.func_module_id, case.caseOrder), constance.REDIS_EXPIRE_TIME, json.dumps(data, ensure_ascii=False))
         # 更新用例表  status  2  res
         TestCase.query.filter_by(id=case.id).update({'status':2, 'res':res.json()})
         # 更新批次明细表  consume  res  success 1
