@@ -125,7 +125,7 @@ class BatchExeCases:
         if param == '提取上一接口数据失败' or data == '提取上一接口数据失败':
             self.failure(case, '提取上一接口数据失败', data)
             return
-        data = ishave(data)
+        data = ishave(data)  # 提取系统提供的方法
 
         try:
             if case.reqType.upper() == 'GET':
@@ -174,7 +174,8 @@ class BatchExeCases:
                 return json.loads(data)
             except Exception as e:
                 if str(e) != '预期结果提取格式不对':
-                    return '提取上一接口数据失败'
+                    print(jmes, last_res)
+                    return '提取上一接口数据失败 {}'.format(jmes)
                 else:
                     return str(e)
 

@@ -1,0 +1,48 @@
+系统结构梳理
+
+数据库：
+# 环境
+id name host
+
+# 模块
+main_module  id  name             一级菜单
+ope_systems  id name module_id    二级菜单，都有哪些系统
+func_module  id name  system_id   三级菜单，都有哪些模块
+
+# 用户
+user id account password role_id     用户表
+role id name     'admin, normal'
+
+# 用例
+test_case  所有用例表
+exe_case_record   用例执行批次表
+exe_case_record_detail  批次明细
+wait_exe_case  待执行表
+
+
+数据提取支持：
+param、data、exp_result
+提取格式
+#序号.res|data.jmespath表达式#   可提取上一接口的返回值和入参数据
+
+#*方法名*#  仅data可用
+
+
+
+报告
+执行编号  系统  模块  环境  用例总数  执行状态  成功   失败   成功率  总耗时
+
+
+万能token
+t4  e957c609b1554018ae97fe1dc86e9cf1
+fz  e957c609b1554018ae97fe1dc86e9cf1
+sc  cb3bac116e7c4b70b793e1d38340d6c0
+
+
+{"Content-Type":"application/x-www-form-urlencoded","Cookie":"uc_token=b666a811a2634a208899db4a73c988aa"}
+
+12.375+9.6525+7.79625+6.80625-6.1875
+
+
+
+

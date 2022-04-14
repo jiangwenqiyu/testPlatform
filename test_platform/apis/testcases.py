@@ -104,13 +104,15 @@ def savecases():
             except Exception as e:
                 return jsonify(status='1', msg='请检查json格式')
             try:
+                print(caseId)
                 TestCase.query.filter_by(id=caseId).update(temp)
                 db.session.commit()
-                return jsonify(status='0', msg='')
             except Exception as e:
                 db.session.rollback()
                 print(e)
                 return jsonify(status='1', msg='数据库更新失败')
+
+    return jsonify(status='0', msg='')
 
 
 
