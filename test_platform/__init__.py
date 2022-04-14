@@ -4,7 +4,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from configs import env_map
 import redis
-
+import datetime
+from . import constance
 
 
 db = SQLAlchemy()
@@ -13,6 +14,8 @@ redis_store = None
 def create_app(env):
     app = Flask(__name__)
     app.config.from_object(env_map[env])
+    app.config['SECRET_KEY'] = 'ji ni tai mei'
+    app.permanent_session_lifetime = datetime.timedelta(seconds=constance.SESSION_EXPIRE_TIME)
 
     db.init_app(app)
 

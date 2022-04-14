@@ -1,7 +1,7 @@
 #encoding=utf8
 
 from test_platform.apis import api, api_login_restful, api_login
-from flask import request, jsonify, current_app, url_for, redirect, render_template
+from flask import request, jsonify, current_app, url_for, redirect, render_template, session
 from test_platform.models import Module, OpeSystems, FuncModule, User
 from test_platform import db
 from flask_restful import Api, Resource
@@ -82,6 +82,10 @@ def getThird():
 # 主页
 @api.route('/', methods=['GET'])
 def index():
+    u = session.get('user')
+    if session.get('user') == None:
+        return redirect('/login')
+
     return current_app.send_static_file('html/index.html')
     # return render_template('html/index.html')
 
@@ -102,6 +106,8 @@ class Login(Resource):
         else:
             db_password = u.password
             if db_password == password:
+                session['user'] = user
+                session.permanent = True
                 return jsonify(status='0', msg = '登录成功！')
             else:
                 return jsonify(status='1', msg = '账号密码错误')

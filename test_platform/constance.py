@@ -1,1 +1,4 @@
+# redis过期时间
 REDIS_EXPIRE_TIME = 60*60*24
+# session过期时间
+SESSION_EXPIRE_TIME = 60*60*24

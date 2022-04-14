@@ -86,7 +86,7 @@ class User(BaseModel, db.Model):
     __tablename__ = 'user'
     account = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
-    role_id = db.Column(db.String(20), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
 
 
