@@ -1,9 +1,10 @@
 #encoding=utf8
 
-from test_platform.apis import api
-from flask import request, jsonify, current_app
-from test_platform.models import Module, OpeSystems, FuncModule
+from test_platform.apis import api, api_login_restful, api_login
+from flask import request, jsonify, current_app, url_for, redirect, render_template
+from test_platform.models import Module, OpeSystems, FuncModule, User
 from test_platform import db
+from flask_restful import Api, Resource
 
 # 获取一级模块
 @api.route('/getfirstlist', methods = ['POST'])
@@ -78,12 +79,36 @@ def getThird():
     return jsonify(status='0', msg='', data = data)
 
 
-
 # 主页
-@api.route('/')
+@api.route('/', methods=['GET'])
 def index():
-    print(123)
     return current_app.send_static_file('html/index.html')
+    # return render_template('html/index.html')
+
+
+
+# 登录页
+class Login(Resource):
+    def get(self):
+        return current_app.send_static_file('html/login.html')
+
+    def post(self):
+        data = request.get_json()
+        user = data.get('user')
+        password = data.get('password')
+        u = User.query.filter_by(account=user).first()
+        if u == None:
+            return jsonify(status='1', msg = '账号密码错误')
+        else:
+            db_password = u.password
+            if db_password == password:
+                return jsonify(status='0', msg = '登录成功！')
+            else:
+                return jsonify(status='1', msg = '账号密码错误')
+
+api_login_restful.add_resource(Login, '/login')
+
+
 
 
 

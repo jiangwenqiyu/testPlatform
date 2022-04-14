@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+
+
+            $('#login').click(function () {
+                $.ajax({
+                    url:'/login',
+                    type: 'post',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({'user':$('#user').val(), 'password': $('#password').val()}),
+                    success: function (resp) {
+                        if (resp.status != '0') {
+                            alert(resp.msg);
+                        } else {
+                            window.location.href = "/loginInfo";
+                        }
+                    }
+
+                })
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+
+
+    <div>用户:<input type="text" id="user"></div>
+    <div>密码:<input type="text" id="password"></div>
+    <button id="login">登录</button>
+
+
+
+
+</body>
+</html>

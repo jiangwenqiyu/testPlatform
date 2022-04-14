@@ -25,6 +25,10 @@ tbody td {
     max-width: 500px;
 }
 
+tbody {
+    height: 10px;
+    overflow: hidden;
+}
 
 
 /*td {*/
