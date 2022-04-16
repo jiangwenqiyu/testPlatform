@@ -1,8 +1,10 @@
 服务名     testplatform.service
 服务器端口  7890
 
+locust服务 locust.service
+端口       8089
 
-系统结构梳理
+
 
 数据库：
 # 环境

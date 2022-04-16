@@ -34,6 +34,7 @@ def generate(urls):
 
     word = ''
     word += 'from locust import HttpUser, between, task\n'
+    word += 'import jmespath\n'
     word += 'import os\n\n'
     word += 'class StressTest(HttpUser):\n\twait_time = between(0,0)\n\thost=""\n'
     for i in range(len(urls)):
@@ -54,9 +55,9 @@ def generate(urls):
             __key = key.split('_')
 
             if __key [0] == 'int':
-                word += '\t\t\t\t\tassert res.json()["{}"] == {}\n'.format(__key[1], urls[i][5][key])
+                word += '\t\t\t\t\tassert jmespath.search("{}", res.json()) == {}\n'.format(__key[1], urls[i][5][key])
             else:
-                word += '\t\t\t\t\tassert res.json()["{}"] == "{}"\n'.format(__key[1], urls[i][5][key])
+                word += '\t\t\t\t\tassert jmespath.search("{}", res.json()) == "{}"\n'.format(__key[1], urls[i][5][key])
         word += '\t\t\t\t\tres.success()\n'
         word += '\t\t\t\texcept:\n'
         word += '\t\t\t\t\tres.failure(res.text)\n'
