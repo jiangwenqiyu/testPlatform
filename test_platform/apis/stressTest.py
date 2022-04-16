@@ -67,7 +67,7 @@ def generate(urls):
     # word += "\tos.system('locust -f ./test_platform/stressScript/stress.py')\n"
 
 
-    with open('./test_platform/stressScript/stress.py', 'w') as f:
+    with open('/data/Jiangjiang/testPlatform/test_platform/stressScript/stress.py', 'w') as f:
         f.write(word)
 
 

@@ -31,5 +31,3 @@ class StressTest(HttpUser):
 				res.failure(res.text)
 
 
-# def main():
-# 	os.system('locust -f ./test_platform/stressScript/stress.py')
