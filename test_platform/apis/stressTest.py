@@ -15,7 +15,11 @@ def test():
     '''
     data = request.get_json()
     urls = data['data']
-    generate(urls)
+    print(urls)
+    try:
+        generate(urls)
+    except Exception as e:
+        return jsonify(status = '1', msg=str(e))
 
     return jsonify(status = '0', msg='生成脚本成功')
 
@@ -50,22 +54,27 @@ def generate(urls):
             word += '\t\twith self.client.get("{}", headers = {}, catch_response=True) as res:\n'.format(urls[i][0], urls[i][3])
 
         word += '\t\t\tif res.status_code==200:\n'
-        word += '\t\t\t\ttry:\n'
-        for key in urls[i][5]:
-            __key = key.split('_')
 
-            if __key [0] == 'int':
-                word += '\t\t\t\t\tassert jmespath.search("{}", res.json()) == {}\n'.format(__key[1], urls[i][5][key])
-            else:
-                word += '\t\t\t\t\tassert jmespath.search("{}", res.json()) == "{}"\n'.format(__key[1], urls[i][5][key])
-        word += '\t\t\t\t\tres.success()\n'
-        word += '\t\t\t\texcept:\n'
-        word += '\t\t\t\t\tres.failure(res.text)\n'
+        if urls[i][5] != '{}':
+
+            word += '\t\t\t\ttry:\n'
+            for key in urls[i][5]:
+                __key = key.split('_')
+                print(key, '***************************')
+                if __key [0] == 'int':
+                    word += '\t\t\t\t\tassert jmespath.search("{}", res.json()) == {}\n'.format(__key[1], urls[i][5][key])
+                else:
+                    word += '\t\t\t\t\tassert jmespath.search("{}", res.json()) == "{}"\n'.format(__key[1], urls[i][5][key])
+            word += '\t\t\t\t\tres.success()\n'
+            word += '\t\t\t\texcept:\n'
+            word += '\t\t\t\t\tres.failure(res.text)\n'
+        else:
+            word += '\t\t\t\tres.success()\n'
         word += '\t\t\telse:\n'
         word += '\t\t\t\tres.failure(res.text)\n'
     word += '\n\n'
 
-
+    print(word)
 
     with open('/data/Jiangjiang/testPlatform/test_platform/stressScript/stress.py', 'w') as f:
         f.write(word)

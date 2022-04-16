@@ -129,8 +129,18 @@ function editThirdColor(obj) {
     // 清空表体内容
     $("#third-content").html("");
 
-    // 嵌入iframe
-    $("#third-content").append("<iframe scrolling=\"yes\" src=\"/static/html/testcase.html\" frameborder=\"0\" width=\"100%\" height=\"100%\"></iframe>")
+    // 如果是压力测试的标签，进入到对应页面
+    if ($(obj).html() == '压力测试') {
+        $("#third-content").append("<iframe scrolling=\"yes\" src=\"/static/html/stressTest.html\" frameborder=\"0\" width=\"100%\" height=\"100%\"></iframe>");
+    } else {
+        // 嵌入iframe
+        $("#third-content").append("<iframe scrolling=\"yes\" src=\"/static/html/testcase.html\" frameborder=\"0\" width=\"100%\" height=\"100%\"></iframe>");
+    }
+
+
+
+
+
 }
 
 

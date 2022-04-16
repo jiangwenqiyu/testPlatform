@@ -3,7 +3,7 @@ from locust import HttpUser, between, task
 import os
 import jmespath
 
-jmespath.search()
+
 
 class StressTest(HttpUser):
 	wait_time = between(0,0)
