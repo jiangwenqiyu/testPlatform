@@ -1,3 +1,4 @@
+#encoding=utf8
 from test_platform.apis import api_stress
 from flask import request, jsonify
 import os

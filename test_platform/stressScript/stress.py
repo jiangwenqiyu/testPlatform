@@ -1,3 +1,4 @@
+#encoding=utf8
 from locust import HttpUser, between, task
 import os
 
