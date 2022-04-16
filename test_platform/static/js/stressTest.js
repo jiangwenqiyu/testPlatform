@@ -55,7 +55,13 @@ function generateScript() {
                     contentType: 'application/json',
 
                     success: function (res) {
-                        alert(res);
+                        if (res.status == '0') {
+                            alert('脚本生成成功');
+                            $('#switch').show();
+                        } else {
+                            alert(res.msg);
+                        }
+
                     }
                 })
 
@@ -69,6 +75,10 @@ function generateScript() {
 }
 
 
+function zhanyong() {
+    alert('占用成功！');
+    $('#btn-gen').show();
+}
 
 
 
