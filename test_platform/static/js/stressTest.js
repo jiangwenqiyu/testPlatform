@@ -51,7 +51,9 @@ function generateScript() {
 
                 $.ajax({
                     url: '/stress/exeScript',
-                    type: 'get',
+                    type: 'post',
+                    contentType: 'application/json',
+
                     success: function (res) {
                         alert(res);
                     }
