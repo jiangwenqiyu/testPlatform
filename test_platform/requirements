@@ -1,0 +1,5 @@
+flask==1.1.2
+flask_sqlalchemy==2.5.1
+locust==1.2.3
+wekzeug==2.0.3
+itsdangerous==1.1.0
