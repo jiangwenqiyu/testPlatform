@@ -1,6 +1,6 @@
 var currentLine = 2;
 function addRow() {
-    $('tbody').append('<tr><td>' + currentLine + '</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>')
+    $('tbody').append('<tr><td>' + currentLine + '</td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td></tr>')
     currentLine += 1;
 }
 

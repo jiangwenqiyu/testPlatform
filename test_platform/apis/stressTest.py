@@ -42,7 +42,7 @@ def generate(urls):
     word += 'import os\n\n'
     word += 'class StressTest(HttpUser):\n\twait_time = between(0,0)\n\thost=""\n'
     for i in range(len(urls)):
-        word += '\t@task(1)\n'
+        word += '\t@task({})\n'.format(urls[i][6])
         word += '\tdef run{}(self):\n'.format(i)
         word += '\t\turl = "{}"\n'.format(urls[i][0])
         if urls[i][1].lower() == 'post':
