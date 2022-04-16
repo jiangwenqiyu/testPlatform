@@ -1,10 +1,40 @@
 #encoding=utf8
 from test_platform.apis import api_stress
-from flask import request, jsonify
+from flask import request, jsonify, session
 import os
-from test_platform.stressScript import stress
-import threading
+from test_platform import redis_store
+from test_platform.constance import STRESS_EXPIRE_TIME
 
+
+@api_stress.route('/zhanyong', methods=['GET'])
+def zhanyong():
+    '''
+    把占用信息存入redis   'zhanyong':user
+    :return:
+    '''
+
+    user = session.get('user')
+    result = redis_store.get('zhanyong')
+    if result == None:
+        redis_store.setex('zhanyong', STRESS_EXPIRE_TIME, user)
+        return jsonify(status='0', msg='占用成功！有效期48小时')
+    else:
+        result = result.decode()
+        return jsonify(status='1', msg='已被 "{}" 占用中'.format(result))
+
+
+@api_stress.route('/zhanyong_release', methods=['GET'])
+def zhanyong_release():
+    user = session.get('user')
+    u = redis_store.get('zhanyong').decode()
+    print(u)
+    if u != None and u != user :
+        return jsonify(status='1', msg='你不是申请占用的用户')
+    elif u == None:
+        return jsonify(status='1', msg='当前无人占用')
+    else:
+        redis_store.delete('zhanyong')
+        return jsonify(status='0', msg='解除占用成功')
 
 
 @api_stress.route('/generateScript', methods = ['POST'])

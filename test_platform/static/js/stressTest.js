@@ -11,34 +11,41 @@ function generateScript() {
     $('tbody').children().each(function (i) {
         if ($.trim($(this).children('td:eq(1)').text()) == '') {
             return 0;
+        }else {
+
+            var temp = [];
+
+            $(this).children().each(function (x) {
+                if (x != 0) {
+                    if ($.trim($(this).text()) == '') {
+                        alert('有内容没填');
+                        throw '必填项不能为空';
+                    } else {
+                        if (x == 6 || x == 4 || x == 5) {
+                            temp.push(
+                                JSON.parse(
+                                    $(this).text()
+                                )
+                            );
+                        } else {
+                            temp.push($(this).text());
+                        }
+
+                    }
+                }
+            });
+            data.push(temp)
         }
 
-        var temp = [];
-
-        $(this).children().each(function (x) {
-            if (x != 0){
-                if ($.trim($(this).text()) == '') {
-                    alert('有内容没填');
-                    throw '必填项不能为空';
-                } else {
-                    if (x == 6 || x == 4 || x == 5) {
-                        temp.push(
-                            JSON.parse(
-                            $(this).text()
-                        )
-                        );
-                    } else {
-                        temp.push($(this).text());
-                    }
-
-                }
-            }
-        });
-
-        data.push(temp)
 
 
     });
+
+    if (JSON.stringify(data) == '[]') {
+        alert('没有有效数据');
+        return
+    }
+
 
     $.ajax({
         url: '/stress/generateScript',
@@ -76,11 +83,39 @@ function generateScript() {
 
 
 function zhanyong() {
-    alert('占用成功！');
-    $('#btn-gen').show();
+    $.ajax({
+        url: '/stress/zhanyong',
+        type: 'get',
+        success: function (res) {
+            alert(res.msg);
+            if (res.status == '0') {
+                $('#btn-gen').show();
+            }
+
+        }
+    });
+
+
+
 }
 
 
+function zhanyong_release() {
+    $.ajax({
+        url: '/stress/zhanyong_release',
+        type: 'get',
+        success: function (res) {
+            alert(res.msg);
+            if (res.status == '0') {
+                $('#btn-gen').hide();
+                $('#switch').hide();
+            }
+
+        }
+    });
+
+
+}
 
 
 

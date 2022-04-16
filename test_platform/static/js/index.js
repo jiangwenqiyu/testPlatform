@@ -132,6 +132,8 @@ function editThirdColor(obj) {
     // 如果是压力测试的标签，进入到对应页面
     if ($(obj).html() == '压力测试') {
         $("#third-content").append("<iframe scrolling=\"yes\" src=\"/static/html/stressTest.html\" frameborder=\"0\" width=\"100%\" height=\"100%\"></iframe>");
+        $("#third-middle").html('');
+        $("#third-middle").append('<strong style="color: red">性能测试占用服务器资源，所以同时只允许一人使用</strong>')
     } else {
         // 嵌入iframe
         $("#third-content").append("<iframe scrolling=\"yes\" src=\"/static/html/testcase.html\" frameborder=\"0\" width=\"100%\" height=\"100%\"></iframe>");
