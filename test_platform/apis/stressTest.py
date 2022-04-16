@@ -23,9 +23,9 @@ def test():
 @api_stress.route('/exeScript', methods = ['POST'])
 def test1():
     # 重启locust服务
-    os.system('')
+    os.system('sudo systemctl restart locust.service')
 
-    return jsonify(status = '0', msg='生成脚本成功')
+    return jsonify(status = '0', msg='服务重启成功！')
 
 
 # urls = [('http://127.0.0.1:5000/stress', 'post', 'data', '{1}', '{2}', {'int_a':789, 'int_abc':111}), ('http://192.168.0.105:7079/usercenter/webapi/tool/getUserPermissionInfo?jobNumber=10001897', 'post', 'json', '{3}', '{3}', {'string_ret.status':'2'})]
