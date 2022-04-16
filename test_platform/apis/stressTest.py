@@ -64,8 +64,7 @@ def generate(urls):
         word += '\t\t\telse:\n'
         word += '\t\t\t\tres.failure(res.text)\n'
     word += '\n\n'
-    # word += "def main():\n"
-    # word += "\tos.system('locust -f ./test_platform/stressScript/stress.py')\n"
+
 
 
     with open('/data/Jiangjiang/testPlatform/test_platform/stressScript/stress.py', 'w') as f:
