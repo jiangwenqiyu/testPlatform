@@ -51,6 +51,10 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
     param = JSON.stringify(param);
     exp = JSON.stringify(exp);
     save = JSON.stringify(save);
+
+    // 错误标红
+    var sty;
+
     // 转换状态为中文
     if (status == '0' || status == null || status == '') {
         status = '就绪';
@@ -58,13 +62,14 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
         status = '成功';
     }else if (status == '3') {
         status = '失败';
+        sty = 'background-color: red'
     }
 
     if (save == null) {
         save = '';
     }
 
-    $("table").append("<tr id='content-tr' caseid='" + caseId + "'>" +
+    $("table").append("<tr id='content-tr' caseid='" + caseId + "' style='" + sty + "'>" +
         "<td class='index'>" + caseOrder + "</td>" +
         "<td contenteditable='true'>" + caseName + "</td>" +
         "<td contenteditable='true'>" + casePath + "</td>" +
@@ -79,6 +84,9 @@ function insertData(caseOrder,caseName,casePath,caseHeader,param, caseData,caseD
         "<td>" + status + "</td>" +
         "<td>" + updateTime + "</td>" +
         "<td><div><a href='javascript:;' onclick='savecase(this)'>保存</a></div><div><a  href='javascript:;' onclick='runSingle(this);'>测试</a></div><div><a  href='javascript:;' onclick='deleteCase(this);'>删除</a></div></td></tr>");
+
+
+
 }
 
 function generateTable() {
